@@ -27,8 +27,8 @@ function MemoryPage() {
 
   useEffect(() => { loadItems(); }, [user, filter]);
 
-  const updateItem = async (id: string, updates: Record<string, any>) => {
-    await supabase.from('memory_items').update(updates).eq('id', id);
+  const updateItem = async (id: string, updates: { status?: string; user_confirmed?: boolean }) => {
+    await supabase.from('memory_items').update(updates as any).eq('id', id);
     loadItems();
   };
 
