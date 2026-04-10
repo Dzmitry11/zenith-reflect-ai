@@ -7,7 +7,7 @@ import { STARTER_CHIPS } from '@/types';
 import type { SessionMode } from '@/types';
 import { Plus, MessageCircle } from 'lucide-react';
 
-export const Route = createFileRoute('/app/chat')({
+export const Route = createFileRoute('/app/chat/')({
   component: ChatListPage,
 });
 
