@@ -11,9 +11,18 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppTherapyPrepRouteImport } from './routes/app.therapy-prep'
+import { Route as AppSubscriptionRouteImport } from './routes/app.subscription'
+import { Route as AppSettingsRouteImport } from './routes/app.settings'
+import { Route as AppSafetyRouteImport } from './routes/app.safety'
+import { Route as AppMemoryRouteImport } from './routes/app.memory'
+import { Route as AppJournalRouteImport } from './routes/app.journal'
+import { Route as AppInsightsRouteImport } from './routes/app.insights'
 import { Route as AppHomeRouteImport } from './routes/app.home'
 import { Route as AppCheckInRouteImport } from './routes/app.check-in'
+import { Route as AppAccountRouteImport } from './routes/app.account'
 import { Route as AppChatIndexRouteImport } from './routes/app.chat.index'
+import { Route as AppChatSessionIdRouteImport } from './routes/app.chat.$sessionId'
 
 const AppRoute = AppRouteImport.update({
   id: '/app',
@@ -25,6 +34,41 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppTherapyPrepRoute = AppTherapyPrepRouteImport.update({
+  id: '/therapy-prep',
+  path: '/therapy-prep',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSubscriptionRoute = AppSubscriptionRouteImport.update({
+  id: '/subscription',
+  path: '/subscription',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSafetyRoute = AppSafetyRouteImport.update({
+  id: '/safety',
+  path: '/safety',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMemoryRoute = AppMemoryRouteImport.update({
+  id: '/memory',
+  path: '/memory',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppJournalRoute = AppJournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInsightsRoute = AppInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppHomeRoute = AppHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -35,40 +79,120 @@ const AppCheckInRoute = AppCheckInRouteImport.update({
   path: '/check-in',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAccountRoute = AppAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppChatIndexRoute = AppChatIndexRouteImport.update({
   id: '/chat/',
   path: '/chat/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppChatSessionIdRoute = AppChatSessionIdRouteImport.update({
+  id: '/chat/$sessionId',
+  path: '/chat/$sessionId',
   getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/app/account': typeof AppAccountRoute
   '/app/check-in': typeof AppCheckInRoute
   '/app/home': typeof AppHomeRoute
+  '/app/insights': typeof AppInsightsRoute
+  '/app/journal': typeof AppJournalRoute
+  '/app/memory': typeof AppMemoryRoute
+  '/app/safety': typeof AppSafetyRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/subscription': typeof AppSubscriptionRoute
+  '/app/therapy-prep': typeof AppTherapyPrepRoute
+  '/app/chat/$sessionId': typeof AppChatSessionIdRoute
   '/app/chat/': typeof AppChatIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/app/account': typeof AppAccountRoute
   '/app/check-in': typeof AppCheckInRoute
   '/app/home': typeof AppHomeRoute
+  '/app/insights': typeof AppInsightsRoute
+  '/app/journal': typeof AppJournalRoute
+  '/app/memory': typeof AppMemoryRoute
+  '/app/safety': typeof AppSafetyRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/subscription': typeof AppSubscriptionRoute
+  '/app/therapy-prep': typeof AppTherapyPrepRoute
+  '/app/chat/$sessionId': typeof AppChatSessionIdRoute
   '/app/chat': typeof AppChatIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/app/account': typeof AppAccountRoute
   '/app/check-in': typeof AppCheckInRoute
   '/app/home': typeof AppHomeRoute
+  '/app/insights': typeof AppInsightsRoute
+  '/app/journal': typeof AppJournalRoute
+  '/app/memory': typeof AppMemoryRoute
+  '/app/safety': typeof AppSafetyRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/subscription': typeof AppSubscriptionRoute
+  '/app/therapy-prep': typeof AppTherapyPrepRoute
+  '/app/chat/$sessionId': typeof AppChatSessionIdRoute
   '/app/chat/': typeof AppChatIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app' | '/app/check-in' | '/app/home' | '/app/chat/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/app/account'
+    | '/app/check-in'
+    | '/app/home'
+    | '/app/insights'
+    | '/app/journal'
+    | '/app/memory'
+    | '/app/safety'
+    | '/app/settings'
+    | '/app/subscription'
+    | '/app/therapy-prep'
+    | '/app/chat/$sessionId'
+    | '/app/chat/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/app' | '/app/check-in' | '/app/home' | '/app/chat'
-  id: '__root__' | '/' | '/app' | '/app/check-in' | '/app/home' | '/app/chat/'
+  to:
+    | '/'
+    | '/app'
+    | '/app/account'
+    | '/app/check-in'
+    | '/app/home'
+    | '/app/insights'
+    | '/app/journal'
+    | '/app/memory'
+    | '/app/safety'
+    | '/app/settings'
+    | '/app/subscription'
+    | '/app/therapy-prep'
+    | '/app/chat/$sessionId'
+    | '/app/chat'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/app/account'
+    | '/app/check-in'
+    | '/app/home'
+    | '/app/insights'
+    | '/app/journal'
+    | '/app/memory'
+    | '/app/safety'
+    | '/app/settings'
+    | '/app/subscription'
+    | '/app/therapy-prep'
+    | '/app/chat/$sessionId'
+    | '/app/chat/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -92,6 +216,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/therapy-prep': {
+      id: '/app/therapy-prep'
+      path: '/therapy-prep'
+      fullPath: '/app/therapy-prep'
+      preLoaderRoute: typeof AppTherapyPrepRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/subscription': {
+      id: '/app/subscription'
+      path: '/subscription'
+      fullPath: '/app/subscription'
+      preLoaderRoute: typeof AppSubscriptionRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/safety': {
+      id: '/app/safety'
+      path: '/safety'
+      fullPath: '/app/safety'
+      preLoaderRoute: typeof AppSafetyRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/memory': {
+      id: '/app/memory'
+      path: '/memory'
+      fullPath: '/app/memory'
+      preLoaderRoute: typeof AppMemoryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/journal': {
+      id: '/app/journal'
+      path: '/journal'
+      fullPath: '/app/journal'
+      preLoaderRoute: typeof AppJournalRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/insights': {
+      id: '/app/insights'
+      path: '/insights'
+      fullPath: '/app/insights'
+      preLoaderRoute: typeof AppInsightsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/home': {
       id: '/app/home'
       path: '/home'
@@ -106,6 +279,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCheckInRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/account': {
+      id: '/app/account'
+      path: '/account'
+      fullPath: '/app/account'
+      preLoaderRoute: typeof AppAccountRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/chat/': {
       id: '/app/chat/'
       path: '/chat'
@@ -113,18 +293,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppChatIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/chat/$sessionId': {
+      id: '/app/chat/$sessionId'
+      path: '/chat/$sessionId'
+      fullPath: '/app/chat/$sessionId'
+      preLoaderRoute: typeof AppChatSessionIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppAccountRoute: typeof AppAccountRoute
   AppCheckInRoute: typeof AppCheckInRoute
   AppHomeRoute: typeof AppHomeRoute
+  AppInsightsRoute: typeof AppInsightsRoute
+  AppJournalRoute: typeof AppJournalRoute
+  AppMemoryRoute: typeof AppMemoryRoute
+  AppSafetyRoute: typeof AppSafetyRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppSubscriptionRoute: typeof AppSubscriptionRoute
+  AppTherapyPrepRoute: typeof AppTherapyPrepRoute
+  AppChatSessionIdRoute: typeof AppChatSessionIdRoute
   AppChatIndexRoute: typeof AppChatIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAccountRoute: AppAccountRoute,
   AppCheckInRoute: AppCheckInRoute,
   AppHomeRoute: AppHomeRoute,
+  AppInsightsRoute: AppInsightsRoute,
+  AppJournalRoute: AppJournalRoute,
+  AppMemoryRoute: AppMemoryRoute,
+  AppSafetyRoute: AppSafetyRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppSubscriptionRoute: AppSubscriptionRoute,
+  AppTherapyPrepRoute: AppTherapyPrepRoute,
+  AppChatSessionIdRoute: AppChatSessionIdRoute,
   AppChatIndexRoute: AppChatIndexRoute,
 }
 
