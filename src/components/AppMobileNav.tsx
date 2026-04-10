@@ -1,5 +1,5 @@
-import { Link, useLocation } from '@tanstack/react-router';
-import { Home, MessageCircle, BookOpen, Heart, BarChart3, Menu, X } from 'lucide-react';
+import { useLocation } from '@tanstack/react-router';
+import { Home, MessageCircle, BookOpen, Heart, BarChart3, Menu } from 'lucide-react';
 import { useState } from 'react';
 import { AppSidebarMobileMenu } from './AppSidebarMobileMenu';
 
@@ -22,16 +22,16 @@ export function AppMobileNav() {
           {mobileNav.map((item) => {
             const active = location.pathname.startsWith(item.to);
             return (
-              <Link
+              <a
                 key={item.to}
-                to={item.to}
+                href={item.to}
                 className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg text-[10px] font-medium transition-colors ${
                   active ? 'text-primary' : 'text-muted-foreground'
                 }`}
               >
                 <item.icon className="w-5 h-5" />
                 {item.label}
-              </Link>
+              </a>
             );
           })}
           <button

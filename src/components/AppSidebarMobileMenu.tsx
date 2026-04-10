@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router';
 import { Brain, ClipboardList, Settings, Shield, CreditCard, User, X, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -28,15 +27,15 @@ export function AppSidebarMobileMenu({ onClose }: { onClose: () => void }) {
         </div>
         <div className="grid grid-cols-3 gap-2">
           {menuItems.map((item) => (
-            <Link
+            <a
               key={item.to}
-              to={item.to}
+              href={item.to}
               onClick={onClose}
               className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-accent text-center"
             >
               <item.icon className="w-5 h-5 text-muted-foreground" />
               <span className="text-xs text-foreground">{item.label}</span>
-            </Link>
+            </a>
           ))}
         </div>
         <button
