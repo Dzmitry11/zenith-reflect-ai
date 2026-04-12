@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { EmptyState } from '@/components/EmptyState';
+import { FadeIn, StaggerContainer, StaggerItem } from '@/components/animations';
 import { BarChart3, TrendingUp, Zap, Heart } from 'lucide-react';
 
 export const Route = createFileRoute('/app/insights')({
@@ -58,10 +59,12 @@ function InsightsPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-      <h1 className="text-2xl font-display font-semibold text-foreground">Insights</h1>
-      <p className="text-sm text-muted-foreground">Patterns emerge over time. Here is what we are noticing.</p>
+      <FadeIn>
+        <h1 className="text-2xl font-display font-semibold text-foreground">Insights</h1>
+        <p className="text-sm text-muted-foreground mt-1">Patterns emerge over time. Here is what we are noticing.</p>
+      </FadeIn>
 
-      <div className="grid grid-cols-3 gap-3">
+      <StaggerContainer className="grid grid-cols-3 gap-3">
         {avgMood && (
           <div className="rounded-2xl bg-card/60 backdrop-blur-md border border-border/50 p-4 text-center">
             <Heart className="w-4 h-4 text-primary mx-auto mb-1" />
@@ -83,7 +86,7 @@ function InsightsPage() {
             <p className="text-xs text-muted-foreground">Avg energy</p>
           </div>
         )}
-      </div>
+      </StaggerContainer>
 
       <div className="rounded-2xl bg-card/60 backdrop-blur-md border border-border/50 p-5">
         <h3 className="text-sm font-medium text-foreground mb-3">Activity</h3>
