@@ -17,7 +17,7 @@ export function AppMobileNav() {
 
   return (
     <>
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-border">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/60 backdrop-blur-xl border-t border-border/30">
         <div className="flex items-center justify-around px-2 py-2">
           {mobileNav.map((item) => {
             const active = location.pathname.startsWith(item.to);

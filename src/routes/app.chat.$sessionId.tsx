@@ -105,7 +105,7 @@ function ChatSessionPage() {
   return (
     <div className="flex flex-col h-screen lg:h-screen">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-background/95 backdrop-blur-sm">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-card/50 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <a href="/app/chat" className="p-1.5 rounded-lg hover:bg-accent lg:hidden">
             <ArrowLeft className="w-5 h-5 text-muted-foreground" />
@@ -147,7 +147,7 @@ function ChatSessionPage() {
               className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
                 msg.role === 'user'
                   ? 'bg-primary text-primary-foreground rounded-br-md'
-                  : 'bg-card border border-border text-foreground rounded-bl-md'
+                  : 'bg-card/60 backdrop-blur-md border border-border/50 text-foreground rounded-bl-md'
               }`}
             >
               {msg.content}
@@ -179,7 +179,7 @@ function ChatSessionPage() {
 
       {/* Composer */}
       {session.status === 'active' && (
-        <div className="border-t border-border px-4 py-3 bg-background">
+        <div className="border-t border-border/50 px-4 py-3 bg-card/40 backdrop-blur-md">
           <div className="flex items-end gap-2 max-w-2xl mx-auto">
             <textarea
               ref={textareaRef}

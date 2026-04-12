@@ -22,7 +22,7 @@ export function AppSidebar() {
   const { signOut } = useAuth();
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 border-r border-border bg-surface h-screen sticky top-0">
+    <aside className="hidden lg:flex flex-col w-64 border-r border-border/30 bg-card/40 backdrop-blur-xl h-screen sticky top-0 z-20">
       <div className="p-6">
         <a href="/app/home" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
