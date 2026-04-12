@@ -57,7 +57,7 @@ function AppHome() {
       </div>
 
       {latestCheckIn && (
-        <div className="rounded-2xl bg-card border border-border p-5">
+        <div className="rounded-2xl bg-card/60 backdrop-blur-md border border-border/50 p-5">
           <div className="flex items-center gap-2 mb-2">
             <Heart className="w-4 h-4 text-primary" />
             <span className="text-sm font-medium text-foreground">Latest check-in</span>
@@ -71,19 +71,19 @@ function AppHome() {
       )}
 
       <div className="grid grid-cols-2 gap-3">
-        <a href="/app/check-in" className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-card border border-border hover:border-primary/30 hover:shadow-sm transition-all">
+        <a href="/app/check-in" className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-card/50 backdrop-blur-md border border-border/40 hover:bg-card/70 hover:border-primary/30 hover:shadow-md transition-all">
           <Heart className="w-5 h-5 text-primary" />
           <span className="text-sm font-medium text-foreground">Check in</span>
         </a>
-        <a href="/app/chat" className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-card border border-border hover:border-primary/30 hover:shadow-sm transition-all">
+        <a href="/app/chat" className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-card/50 backdrop-blur-md border border-border/40 hover:bg-card/70 hover:border-primary/30 hover:shadow-md transition-all">
           <MessageCircle className="w-5 h-5 text-primary" />
           <span className="text-sm font-medium text-foreground">Start a chat</span>
         </a>
-        <a href="/app/journal" className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-card border border-border hover:border-primary/30 hover:shadow-sm transition-all">
+        <a href="/app/journal" className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-card/50 backdrop-blur-md border border-border/40 hover:bg-card/70 hover:border-primary/30 hover:shadow-md transition-all">
           <BookOpen className="w-5 h-5 text-primary" />
           <span className="text-sm font-medium text-foreground">Journal</span>
         </a>
-        <a href="/app/therapy-prep" className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-card border border-border hover:border-primary/30 hover:shadow-sm transition-all">
+        <a href="/app/therapy-prep" className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-card/50 backdrop-blur-md border border-border/40 hover:bg-card/70 hover:border-primary/30 hover:shadow-md transition-all">
           <ClipboardList className="w-5 h-5 text-primary" />
           <span className="text-sm font-medium text-foreground">Therapy prep</span>
         </a>
@@ -96,7 +96,7 @@ function AppHome() {
           <h2 className="text-sm font-medium text-foreground mb-3">Recent sessions</h2>
           <div className="space-y-2">
             {recentSessions.map((s) => (
-              <a key={s.id} href={`/app/chat/${s.id}`} className="block p-4 rounded-xl bg-card border border-border hover:border-primary/20 transition-all">
+              <a key={s.id} href={`/app/chat/${s.id}`} className="block p-4 rounded-xl bg-card/50 backdrop-blur-md border border-border/40 hover:bg-card/70 hover:border-primary/20 transition-all">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-foreground">{s.title || 'Untitled session'}</span>
                   <span className="text-xs text-muted-foreground">{new Date(s.created_at).toLocaleDateString()}</span>

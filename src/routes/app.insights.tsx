@@ -63,21 +63,21 @@ function InsightsPage() {
 
       <div className="grid grid-cols-3 gap-3">
         {avgMood && (
-          <div className="rounded-2xl bg-card border border-border p-4 text-center">
+          <div className="rounded-2xl bg-card/60 backdrop-blur-md border border-border/50 p-4 text-center">
             <Heart className="w-4 h-4 text-primary mx-auto mb-1" />
             <p className="text-2xl font-display font-semibold text-foreground">{avgMood}</p>
             <p className="text-xs text-muted-foreground">Avg mood</p>
           </div>
         )}
         {avgStress && (
-          <div className="rounded-2xl bg-card border border-border p-4 text-center">
+          <div className="rounded-2xl bg-card/60 backdrop-blur-md border border-border/50 p-4 text-center">
             <Zap className="w-4 h-4 text-warm-foreground mx-auto mb-1" />
             <p className="text-2xl font-display font-semibold text-foreground">{avgStress}</p>
             <p className="text-xs text-muted-foreground">Avg stress</p>
           </div>
         )}
         {avgEnergy && (
-          <div className="rounded-2xl bg-card border border-border p-4 text-center">
+          <div className="rounded-2xl bg-card/60 backdrop-blur-md border border-border/50 p-4 text-center">
             <TrendingUp className="w-4 h-4 text-calm-foreground mx-auto mb-1" />
             <p className="text-2xl font-display font-semibold text-foreground">{avgEnergy}</p>
             <p className="text-xs text-muted-foreground">Avg energy</p>
@@ -85,7 +85,7 @@ function InsightsPage() {
         )}
       </div>
 
-      <div className="rounded-2xl bg-card border border-border p-5">
+      <div className="rounded-2xl bg-card/60 backdrop-blur-md border border-border/50 p-5">
         <h3 className="text-sm font-medium text-foreground mb-3">Activity</h3>
         <div className="flex gap-6 text-sm text-muted-foreground">
           <div><span className="font-medium text-foreground">{totalSessions}</span> sessions</div>
@@ -95,7 +95,7 @@ function InsightsPage() {
       </div>
 
       {sortedEmotions.length > 0 && (
-        <div className="rounded-2xl bg-card border border-border p-5">
+        <div className="rounded-2xl bg-card/60 backdrop-blur-md border border-border/50 p-5">
           <h3 className="text-sm font-medium text-foreground mb-3">Most frequent emotions</h3>
           <div className="space-y-2">
             {sortedEmotions.map(([emotion, count]) => (
@@ -112,7 +112,7 @@ function InsightsPage() {
       )}
 
       {sessions.length > 0 && (
-        <div className="rounded-2xl bg-card border border-border p-5">
+        <div className="rounded-2xl bg-card/60 backdrop-blur-md border border-border/50 p-5">
           <h3 className="text-sm font-medium text-foreground mb-3">Recent session modes</h3>
           <div className="flex flex-wrap gap-2">
             {sessions.slice(0, 10).map((s) => (
