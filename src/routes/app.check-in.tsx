@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { EMOTION_OPTIONS } from '@/types';
+import { FadeIn, ScaleIn } from '@/components/animations';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const Route = createFileRoute('/app/check-in')({
   component: CheckInPage,
@@ -49,19 +51,25 @@ function CheckInPage() {
   if (submitted) {
     return (
       <div className="max-w-lg mx-auto px-4 py-12 text-center space-y-6">
-        <div className="text-4xl">🌿</div>
-        <h2 className="text-xl font-display font-semibold text-foreground">Check-in saved</h2>
-        <p className="text-muted-foreground text-sm">Thank you for taking a moment to notice how you are feeling.</p>
-        <div className="rounded-2xl bg-card border border-border p-5 text-left space-y-3">
-          <div className="flex justify-between text-sm"><span className="text-muted-foreground">Mood</span><span className="text-foreground">{mood}/10</span></div>
-          <div className="flex justify-between text-sm"><span className="text-muted-foreground">Stress</span><span className="text-foreground">{stress}/10</span></div>
-          <div className="flex justify-between text-sm"><span className="text-muted-foreground">Energy</span><span className="text-foreground">{energy}/10</span></div>
-          {emotion && <div className="flex justify-between text-sm"><span className="text-muted-foreground">Feeling</span><span className="text-foreground">{emotion}</span></div>}
-        </div>
-        <div className="flex gap-3 justify-center">
-          <a href="/app/chat"><Button variant="default">Open a chat about this</Button></a>
-          <a href="/app/home"><Button variant="outline">Back to home</Button></a>
-        </div>
+        <ScaleIn>
+          <div className="text-4xl">🌿</div>
+          <h2 className="text-xl font-display font-semibold text-foreground mt-4">Check-in saved</h2>
+          <p className="text-muted-foreground text-sm mt-2">Thank you for taking a moment to notice how you are feeling.</p>
+        </ScaleIn>
+        <FadeIn delay={0.2}>
+          <div className="rounded-2xl bg-card/60 backdrop-blur-md border border-border/50 p-5 text-left space-y-3">
+            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Mood</span><span className="text-foreground">{mood}/10</span></div>
+            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Stress</span><span className="text-foreground">{stress}/10</span></div>
+            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Energy</span><span className="text-foreground">{energy}/10</span></div>
+            {emotion && <div className="flex justify-between text-sm"><span className="text-muted-foreground">Feeling</span><span className="text-foreground">{emotion}</span></div>}
+          </div>
+        </FadeIn>
+        <FadeIn delay={0.35}>
+          <div className="flex gap-3 justify-center">
+            <a href="/app/chat"><Button variant="default">Open a chat about this</Button></a>
+            <a href="/app/home"><Button variant="outline">Back to home</Button></a>
+          </div>
+        </FadeIn>
       </div>
     );
   }
@@ -162,10 +170,20 @@ function CheckInPage() {
       <div className="mb-8">
         <div className="flex gap-1 mb-6">
           {steps.map((_, i) => (
-            <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= step ? 'bg-primary' : 'bg-border'}`} />
+            <div key={i} className={`h-1 flex-1 rounded-full transition-colors duration-500 ${i <= step ? 'bg-primary' : 'bg-border'}`} />
           ))}
         </div>
-        {steps[step]}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -30 }}
+            transition={{ duration: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
+          >
+            {steps[step]}
+          </motion.div>
+        </AnimatePresence>
       </div>
       <div className="flex gap-3">
         {step > 0 && <Button variant="outline" onClick={() => setStep(step - 1)}>Back</Button>}
