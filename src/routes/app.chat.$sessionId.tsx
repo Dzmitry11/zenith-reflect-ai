@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
@@ -8,11 +8,103 @@ import { createAssistantReply, summarizeSession } from '@/services/response-engi
 import { classifyRiskLevel } from '@/services/risk-classifier';
 import { STARTER_CHIPS } from '@/types';
 import type { SessionMode, RiskLevel } from '@/types';
-import { Send, ArrowLeft, MoreHorizontal } from 'lucide-react';
+import { Send, ArrowLeft } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const Route = createFileRoute('/app/chat/$sessionId')({
   component: ChatSessionPage,
 });
+
+/* ── Typing animation hook ── */
+function useTypingEffect(text: string, speed = 18) {
+  const [displayed, setDisplayed] = useState('');
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    setDisplayed('');
+    setDone(false);
+    let i = 0;
+    const id = setInterval(() => {
+      i++;
+      setDisplayed(text.slice(0, i));
+      if (i >= text.length) {
+        clearInterval(id);
+        setDone(true);
+      }
+    }, speed);
+    return () => clearInterval(id);
+  }, [text, speed]);
+
+  return { displayed, done };
+}
+
+/* ── Single message bubble ── */
+function MessageBubble({ msg, isLatestAssistant }: { msg: any; isLatestAssistant: boolean }) {
+  const isUser = msg.role === 'user';
+  const { displayed, done } = useTypingEffect(
+    isLatestAssistant ? msg.content : msg.content,
+    isLatestAssistant ? 18 : 0,
+  );
+
+  const text = isLatestAssistant && !done ? displayed : msg.content;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.35, ease: [0.25, 0.4, 0.25, 1] as const }}
+      className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
+    >
+      <div
+        className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+          isUser
+            ? 'bg-primary text-primary-foreground rounded-br-md'
+            : 'bg-card/60 backdrop-blur-md border border-border/50 text-foreground rounded-bl-md'
+        }`}
+      >
+        {text}
+        {isLatestAssistant && !done && (
+          <motion.span
+            animate={{ opacity: [1, 0] }}
+            transition={{ repeat: Infinity, duration: 0.6 }}
+            className="inline-block w-[2px] h-[1em] bg-foreground/60 ml-0.5 align-text-bottom"
+          />
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
+/* ── Typing indicator dots ── */
+function TypingDots() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -6 }}
+      transition={{ duration: 0.25 }}
+      className="flex justify-start"
+    >
+      <div className="bg-card/60 backdrop-blur-md border border-border/50 rounded-2xl rounded-bl-md px-4 py-3">
+        <div className="flex gap-1.5">
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="w-2 h-2 rounded-full bg-muted-foreground/50"
+              animate={{ y: [0, -6, 0] }}
+              transition={{
+                repeat: Infinity,
+                duration: 0.8,
+                delay: i * 0.15,
+                ease: 'easeInOut',
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 function ChatSessionPage() {
   const { sessionId } = Route.useParams();
@@ -22,6 +114,7 @@ function ChatSessionPage() {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [riskLevel, setRiskLevel] = useState<RiskLevel>('green');
+  const [latestAssistantId, setLatestAssistantId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -45,6 +138,7 @@ function ChatSessionPage() {
   const sendMessage = async (content: string) => {
     if (!user || !content.trim() || !session) return;
     setSending(true);
+    setInput('');
 
     const risk = classifyRiskLevel(content);
     setRiskLevel(risk);
@@ -67,11 +161,13 @@ function ChatSessionPage() {
     const reply = createAssistantReply(session.mode as SessionMode, content, sessionId);
     const assistantMsg = { session_id: sessionId, user_id: user.id, role: 'assistant' as const, content: reply };
     const { data: savedAssistant } = await supabase.from('messages').insert(assistantMsg).select().single();
-    if (savedAssistant) setMessages((prev) => [...prev, savedAssistant]);
+    if (savedAssistant) {
+      setLatestAssistantId(savedAssistant.id);
+      setMessages((prev) => [...prev, savedAssistant]);
+    }
 
     await supabase.from('sessions').update({ risk_level: risk }).eq('id', sessionId);
 
-    setInput('');
     setSending(false);
     textareaRef.current?.focus();
   };
@@ -124,56 +220,57 @@ function ChatSessionPage() {
 
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
-        {messages.length === 0 && (
-          <div className="text-center py-12 space-y-4">
-            <p className="text-muted-foreground text-sm">Start with what feels most present.</p>
-            <div className="flex flex-wrap gap-2 justify-center max-w-md mx-auto">
-              {STARTER_CHIPS.slice(0, 4).map((chip) => (
-                <button
-                  key={chip}
-                  onClick={() => sendMessage(chip)}
-                  className="px-3 py-2 rounded-xl text-xs bg-card border border-border text-foreground hover:border-primary/30 transition-all"
-                >
-                  {chip}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        <AnimatePresence>
+          {messages.length === 0 && (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="text-center py-12 space-y-4"
+            >
+              <p className="text-muted-foreground text-sm">Start with what feels most present.</p>
+              <div className="flex flex-wrap gap-2 justify-center max-w-md mx-auto">
+                {STARTER_CHIPS.slice(0, 4).map((chip, i) => (
+                  <motion.button
+                    key={chip}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 + i * 0.08 }}
+                    onClick={() => sendMessage(chip)}
+                    className="px-3 py-2 rounded-xl text-xs bg-card border border-border text-foreground hover:border-primary/30 transition-all"
+                  >
+                    {chip}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div
-              className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
-                msg.role === 'user'
-                  ? 'bg-primary text-primary-foreground rounded-br-md'
-                  : 'bg-card/60 backdrop-blur-md border border-border/50 text-foreground rounded-bl-md'
-              }`}
-            >
-              {msg.content}
-            </div>
-          </div>
+          <MessageBubble
+            key={msg.id}
+            msg={msg}
+            isLatestAssistant={msg.id === latestAssistantId && msg.role === 'assistant'}
+          />
         ))}
 
-        {sending && (
-          <div className="flex justify-start">
-            <div className="bg-card border border-border rounded-2xl rounded-bl-md px-4 py-3">
-              <div className="flex gap-1">
-                <div className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: '0ms' }} />
-                <div className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: '150ms' }} />
-                <div className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: '300ms' }} />
-              </div>
-            </div>
-          </div>
-        )}
+        <AnimatePresence>
+          {sending && <TypingDots />}
+        </AnimatePresence>
 
         {riskLevel !== 'green' && <RiskNotice level={riskLevel} />}
 
         {session.status === 'completed' && session.summary && (
-          <div className="rounded-2xl bg-calm/20 border border-calm/30 p-5 space-y-2">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="rounded-2xl bg-calm/20 border border-calm/30 p-5 space-y-2"
+          >
             <h3 className="text-sm font-medium text-foreground">Session summary</h3>
             <p className="text-sm text-muted-foreground">{session.summary}</p>
-          </div>
+          </motion.div>
         )}
       </div>
 
