@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { STARTER_CHIPS } from '@/types';
 import type { SessionMode, RiskLevel } from '@/types';
 import { Send, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getCompanionAvatar, getCompanionName } from '@/components/CompanionAvatarPicker';
 
 export const Route = createFileRoute('/app/chat/$sessionId')({
   component: ChatSessionPage,
@@ -39,7 +40,7 @@ function useTypingEffect(text: string, speed = 18) {
 }
 
 /* ── Single message bubble ── */
-function MessageBubble({ msg, isLatestAssistant }: { msg: any; isLatestAssistant: boolean }) {
+function MessageBubble({ msg, isLatestAssistant, companionAvatar, companionName }: { msg: any; isLatestAssistant: boolean; companionAvatar: string; companionName: string }) {
   const isUser = msg.role === 'user';
   const { displayed, done } = useTypingEffect(
     isLatestAssistant ? msg.content : msg.content,
@@ -53,10 +54,20 @@ function MessageBubble({ msg, isLatestAssistant }: { msg: any; isLatestAssistant
       initial={{ opacity: 0, y: 16, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.35, ease: [0.25, 0.4, 0.25, 1] as const }}
-      className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
+      className={`flex items-end gap-2.5 ${isUser ? 'justify-end' : 'justify-start'}`}
     >
+      {!isUser && (
+        <img
+          src={companionAvatar}
+          alt={companionName}
+          className="w-8 h-8 rounded-full object-cover ring-1 ring-border/50 flex-shrink-0"
+          loading="lazy"
+          width={32}
+          height={32}
+        />
+      )}
       <div
-        className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+        className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
           isUser
             ? 'bg-primary text-primary-foreground rounded-br-md'
             : 'bg-card/60 backdrop-blur-md border border-border/50 text-foreground rounded-bl-md'
@@ -76,15 +87,22 @@ function MessageBubble({ msg, isLatestAssistant }: { msg: any; isLatestAssistant
 }
 
 /* ── Typing indicator dots ── */
-function TypingDots() {
+function TypingDots({ companionAvatar, companionName }: { companionAvatar: string; companionName: string }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -6 }}
       transition={{ duration: 0.25 }}
-      className="flex justify-start"
+      className="flex items-end gap-2.5 justify-start"
     >
+      <img
+        src={companionAvatar}
+        alt={companionName}
+        className="w-8 h-8 rounded-full object-cover ring-1 ring-border/50 flex-shrink-0"
+        width={32}
+        height={32}
+      />
       <div className="bg-card/60 backdrop-blur-md border border-border/50 rounded-2xl rounded-bl-md px-4 py-3">
         <div className="flex gap-1.5">
           {[0, 1, 2].map((i) => (
@@ -115,18 +133,24 @@ function ChatSessionPage() {
   const [sending, setSending] = useState(false);
   const [riskLevel, setRiskLevel] = useState<RiskLevel>('green');
   const [latestAssistantId, setLatestAssistantId] = useState<string | null>(null);
+  const [companionId, setCompanionId] = useState('aurora');
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const companionAvatar = getCompanionAvatar(companionId);
+  const companionName = getCompanionName(companionId);
 
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      const [sessionRes, messagesRes] = await Promise.all([
+      const [sessionRes, messagesRes, prefsRes] = await Promise.all([
         supabase.from('sessions').select('*').eq('id', sessionId).eq('user_id', user.id).single(),
         supabase.from('messages').select('*').eq('session_id', sessionId).eq('user_id', user.id).order('created_at', { ascending: true }),
+        supabase.from('user_preferences').select('companion_avatar').eq('user_id', user.id).single(),
       ]);
       if (sessionRes.data) setSession(sessionRes.data);
       if (messagesRes.data) setMessages(messagesRes.data);
+      if (prefsRes.data?.companion_avatar) setCompanionId(prefsRes.data.companion_avatar);
     };
     load();
   }, [user, sessionId]);
@@ -157,7 +181,6 @@ function ChatSessionPage() {
     const { data: savedUser } = await supabase.from('messages').insert(userMsg).select().single();
     if (savedUser) setMessages((prev) => [...prev, savedUser]);
 
-    // Generate assistant reply
     const reply = createAssistantReply(session.mode as SessionMode, content, sessionId);
     const assistantMsg = { session_id: sessionId, user_id: user.id, role: 'assistant' as const, content: reply };
     const { data: savedAssistant } = await supabase.from('messages').insert(assistantMsg).select().single();
@@ -206,8 +229,15 @@ function ChatSessionPage() {
           <a href="/app/chat" className="p-1.5 rounded-lg hover:bg-accent lg:hidden">
             <ArrowLeft className="w-5 h-5 text-muted-foreground" />
           </a>
+          <img
+            src={companionAvatar}
+            alt={companionName}
+            className="w-9 h-9 rounded-full object-cover ring-2 ring-primary/20"
+            width={36}
+            height={36}
+          />
           <div>
-            <h2 className="text-sm font-medium text-foreground">{session.title || 'Session'}</h2>
+            <h2 className="text-sm font-medium text-foreground">{companionName}</h2>
             <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full bg-secondary">{session.mode.replace('_', ' ')}</span>
           </div>
         </div>
@@ -227,9 +257,19 @@ function ChatSessionPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="text-center py-12 space-y-4"
+              className="text-center py-12 space-y-6"
             >
-              <p className="text-muted-foreground text-sm">Start with what feels most present.</p>
+              <img
+                src={companionAvatar}
+                alt={companionName}
+                className="w-20 h-20 rounded-full object-cover mx-auto ring-2 ring-primary/20 shadow-lg"
+                width={80}
+                height={80}
+              />
+              <div>
+                <p className="text-foreground font-medium">{companionName}</p>
+                <p className="text-muted-foreground text-sm mt-1">Start with what feels most present.</p>
+              </div>
               <div className="flex flex-wrap gap-2 justify-center max-w-md mx-auto">
                 {STARTER_CHIPS.slice(0, 4).map((chip, i) => (
                   <motion.button
@@ -253,11 +293,13 @@ function ChatSessionPage() {
             key={msg.id}
             msg={msg}
             isLatestAssistant={msg.id === latestAssistantId && msg.role === 'assistant'}
+            companionAvatar={companionAvatar}
+            companionName={companionName}
           />
         ))}
 
         <AnimatePresence>
-          {sending && <TypingDots />}
+          {sending && <TypingDots companionAvatar={companionAvatar} companionName={companionName} />}
         </AnimatePresence>
 
         {riskLevel !== 'green' && <RiskNotice level={riskLevel} />}
