@@ -1,0 +1,1 @@
+ALTER TABLE public.user_preferences ADD COLUMN companion_avatar TEXT DEFAULT 'aurora';
