@@ -465,6 +465,7 @@ export type Database = {
       }
       user_preferences: {
         Row: {
+          companion_avatar: string | null
           created_at: string
           id: string
           main_goal: string | null
@@ -477,6 +478,7 @@ export type Database = {
           weekly_summary_enabled: boolean | null
         }
         Insert: {
+          companion_avatar?: string | null
           created_at?: string
           id?: string
           main_goal?: string | null
@@ -489,6 +491,7 @@ export type Database = {
           weekly_summary_enabled?: boolean | null
         }
         Update: {
+          companion_avatar?: string | null
           created_at?: string
           id?: string
           main_goal?: string | null

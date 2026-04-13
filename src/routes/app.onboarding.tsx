@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
+import { CompanionAvatarPicker, type CompanionId } from '@/components/CompanionAvatarPicker';
 
 export const Route = createFileRoute('/app/onboarding')({ component: OnboardingPage });
 
@@ -10,6 +11,7 @@ function OnboardingPage() {
   const { user } = useAuth();
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
+  const [companion, setCompanion] = useState<CompanionId>('aurora');
   const [tone, setTone] = useState('warm_and_gentle');
   const [goal, setGoal] = useState('');
   const [sessionLen, setSessionLen] = useState('10');
@@ -23,7 +25,7 @@ function OnboardingPage() {
     setSaving(true);
     await Promise.all([
       supabase.from('profiles').update({ display_name: name, onboarding_completed: true }).eq('id', user.id),
-      supabase.from('user_preferences').update({ tone_preference: tone, main_goal: goal, preferred_session_length: sessionLen, memory_enabled: memoryEnabled }).eq('user_id', user.id),
+      supabase.from('user_preferences').update({ tone_preference: tone, main_goal: goal, preferred_session_length: sessionLen, memory_enabled: memoryEnabled, companion_avatar: companion }).eq('user_id', user.id),
     ]);
     window.location.href = '/app/home';
   };
@@ -34,6 +36,7 @@ function OnboardingPage() {
       <p className="text-sm text-muted-foreground">A first name or nickname is fine.</p>
       <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
     </div>,
+    <CompanionAvatarPicker key="companion" selected={companion} onChange={setCompanion} />,
     <div key="tone" className="space-y-6">
       <h2 className="text-xl font-display font-semibold text-foreground">How should Reflecta talk to you?</h2>
       <div className="space-y-2">
