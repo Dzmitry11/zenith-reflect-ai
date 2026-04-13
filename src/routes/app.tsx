@@ -2,6 +2,7 @@ import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { AppSidebar } from '@/components/AppSidebar';
 import { AppMobileNav } from '@/components/AppMobileNav';
 import { AmbientMusicPlayer } from '@/components/AmbientMusicPlayer';
+import { PageTransition } from '@/components/PageTransition';
 import bgMain from '@/assets/bg-main.jpg';
 
 export const Route = createFileRoute('/app')({
@@ -20,7 +21,9 @@ function AppLayout() {
       
       <AppSidebar />
       <main className="flex-1 pb-20 lg:pb-0 relative z-10">
-        <Outlet />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
       <AppMobileNav />
       <AmbientMusicPlayer />
