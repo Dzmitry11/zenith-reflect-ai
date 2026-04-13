@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
+import { CompanionAvatarPicker, type CompanionId } from '@/components/CompanionAvatarPicker';
 
 export const Route = createFileRoute('/app/settings')({
   component: SettingsPage,
@@ -34,6 +35,7 @@ function SettingsPage() {
         preferred_session_length: prefs.preferred_session_length,
         memory_enabled: prefs.memory_enabled,
         weekly_summary_enabled: prefs.weekly_summary_enabled,
+        companion_avatar: prefs.companion_avatar,
       }).eq('user_id', user.id),
       supabase.from('profiles').update({ display_name: profile.display_name }).eq('id', user.id),
     ]);
@@ -51,6 +53,11 @@ function SettingsPage() {
           <label className="text-sm font-medium text-foreground mb-1.5 block">Display name</label>
           <input value={profile.display_name || ''} onChange={(e) => setProfile({ ...profile, display_name: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
         </div>
+
+        <CompanionAvatarPicker
+          selected={(prefs.companion_avatar || 'aurora') as CompanionId}
+          onChange={(id) => setPrefs({ ...prefs, companion_avatar: id })}
+        />
 
         <div>
           <label className="text-sm font-medium text-foreground mb-1.5 block">Tone preference</label>
