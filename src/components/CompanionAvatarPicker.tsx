@@ -52,8 +52,9 @@ export function CompanionAvatarPicker({ selected, onChange }: CompanionAvatarPic
                 : 'border-border bg-card/60 hover:border-primary/30'
             }`}
           >
-            <div className="relative w-24 h-24 rounded-full overflow-hidden mb-3 ring-2 ring-offset-2 ring-offset-background transition-all"
-              style={{ ringColor: selected === c.id ? 'hsl(var(--primary))' : 'transparent' }}
+            <div className={`relative w-24 h-24 rounded-full overflow-hidden mb-3 ring-2 ring-offset-2 ring-offset-background transition-all ${
+              selected === c.id ? 'ring-primary' : 'ring-transparent'
+            }`}
             >
               <img
                 src={c.avatar}
