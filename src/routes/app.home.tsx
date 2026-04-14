@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { FadeIn, StaggerContainer, StaggerItem, ScaleIn } from '@/components/animations';
 import { CALMING_QUOTES } from '@/types';
 import { Heart, MessageCircle, BookOpen, ClipboardList, Sparkles } from 'lucide-react';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 export const Route = createFileRoute('/app/home')({
   component: AppHome,
@@ -16,6 +17,7 @@ export const Route = createFileRoute('/app/home')({
 
 function AppHome() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [profile, setProfile] = useState<{ display_name: string | null } | null>(null);
   const [latestCheckIn, setLatestCheckIn] = useState<any>(null);
   const [recentSessions, setRecentSessions] = useState<any[]>([]);
@@ -41,9 +43,9 @@ function AppHome() {
 
   const greeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
+    if (hour < 12) return t('goodMorning');
+    if (hour < 17) return t('goodAfternoon');
+    return t('goodEvening');
   };
 
   const name = profile?.display_name || 'there';
@@ -55,7 +57,7 @@ function AppHome() {
           <h1 className="text-2xl font-display font-semibold text-foreground">
             {greeting()}, {name}
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">How are you showing up today?</p>
+          <p className="text-muted-foreground text-sm mt-1">{t('howShowingUp')}</p>
         </div>
       </FadeIn>
 
@@ -64,12 +66,12 @@ function AppHome() {
           <div className="rounded-2xl bg-card/60 backdrop-blur-md border border-border/50 p-5">
             <div className="flex items-center gap-2 mb-2">
               <Heart className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-foreground">Latest check-in</span>
+              <span className="text-sm font-medium text-foreground">{t('latestCheckIn')}</span>
             </div>
             <div className="flex gap-4 text-sm text-muted-foreground">
-              {latestCheckIn.primary_emotion && <span>Feeling: {latestCheckIn.primary_emotion}</span>}
-              {latestCheckIn.mood_score && <span>Mood: {latestCheckIn.mood_score}/10</span>}
-              {latestCheckIn.energy_score && <span>Energy: {latestCheckIn.energy_score}/10</span>}
+              {latestCheckIn.primary_emotion && <span>{t('feeling')}: {latestCheckIn.primary_emotion}</span>}
+              {latestCheckIn.mood_score && <span>{t('mood')}: {latestCheckIn.mood_score}/10</span>}
+              {latestCheckIn.energy_score && <span>{t('energy')}: {latestCheckIn.energy_score}/10</span>}
             </div>
           </div>
         </FadeIn>
@@ -79,25 +81,25 @@ function AppHome() {
         <StaggerItem>
           <a href="/app/check-in" className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-card/50 backdrop-blur-md border border-border/40 hover:bg-card/70 hover:border-primary/30 hover:shadow-md transition-all">
             <Heart className="w-5 h-5 text-primary" />
-            <span className="text-sm font-medium text-foreground">Check in</span>
+            <span className="text-sm font-medium text-foreground">{t('checkIn')}</span>
           </a>
         </StaggerItem>
         <StaggerItem>
           <a href="/app/chat" className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-card/50 backdrop-blur-md border border-border/40 hover:bg-card/70 hover:border-primary/30 hover:shadow-md transition-all">
             <MessageCircle className="w-5 h-5 text-primary" />
-            <span className="text-sm font-medium text-foreground">Start a chat</span>
+            <span className="text-sm font-medium text-foreground">{t('startChat')}</span>
           </a>
         </StaggerItem>
         <StaggerItem>
           <a href="/app/journal" className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-card/50 backdrop-blur-md border border-border/40 hover:bg-card/70 hover:border-primary/30 hover:shadow-md transition-all">
             <BookOpen className="w-5 h-5 text-primary" />
-            <span className="text-sm font-medium text-foreground">Journal</span>
+            <span className="text-sm font-medium text-foreground">{t('journal')}</span>
           </a>
         </StaggerItem>
         <StaggerItem>
           <a href="/app/therapy-prep" className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-card/50 backdrop-blur-md border border-border/40 hover:bg-card/70 hover:border-primary/30 hover:shadow-md transition-all">
             <ClipboardList className="w-5 h-5 text-primary" />
-            <span className="text-sm font-medium text-foreground">Therapy prep</span>
+            <span className="text-sm font-medium text-foreground">{t('therapyPrep')}</span>
           </a>
         </StaggerItem>
       </StaggerContainer>
@@ -109,13 +111,13 @@ function AppHome() {
       {recentSessions.length > 0 && (
         <FadeIn>
           <div>
-            <h2 className="text-sm font-medium text-foreground mb-3">Recent sessions</h2>
+            <h2 className="text-sm font-medium text-foreground mb-3">{t('recentSessions')}</h2>
             <div className="space-y-2">
               {recentSessions.map((s, i) => (
                 <FadeIn key={s.id} delay={i * 0.06} direction="left">
                   <a href={`/app/chat/${s.id}`} className="block p-4 rounded-xl bg-card/50 backdrop-blur-md border border-border/40 hover:bg-card/70 hover:border-primary/20 transition-all">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-foreground">{s.title || 'Untitled session'}</span>
+                      <span className="text-sm font-medium text-foreground">{s.title || t('untitledSession')}</span>
                       <span className="text-xs text-muted-foreground">{new Date(s.created_at).toLocaleDateString()}</span>
                     </div>
                     <div className="flex gap-2 mt-1.5">
@@ -135,11 +137,11 @@ function AppHome() {
           <div className="rounded-2xl bg-gradient-to-br from-primary/5 to-calm/20 border border-primary/10 p-5">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-foreground">Unlock more with Premium</span>
+              <span className="text-sm font-medium text-foreground">{t('unlockPremium')}</span>
             </div>
-            <p className="text-xs text-muted-foreground mb-3">Unlimited sessions, full insights, therapy prep exports, and more.</p>
+            <p className="text-xs text-muted-foreground mb-3">{t('unlockPremiumDesc')}</p>
             <a href="/app/subscription">
-              <Button size="sm" variant="default">View plans</Button>
+              <Button size="sm" variant="default">{t('viewPlans')}</Button>
             </a>
           </div>
         </ScaleIn>

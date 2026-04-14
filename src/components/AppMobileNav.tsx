@@ -2,18 +2,21 @@ import { useLocation } from '@tanstack/react-router';
 import { Home, MessageCircle, BookOpen, Heart, BarChart3, Menu } from 'lucide-react';
 import { useState } from 'react';
 import { AppSidebarMobileMenu } from './AppSidebarMobileMenu';
+import { useLanguage } from '@/i18n/LanguageContext';
+import type { TranslationKey } from '@/i18n/translations';
 
-const mobileNav = [
-  { to: '/app/home', label: 'Home', icon: Home },
-  { to: '/app/check-in', label: 'Check-in', icon: Heart },
-  { to: '/app/chat', label: 'Chat', icon: MessageCircle },
-  { to: '/app/journal', label: 'Journal', icon: BookOpen },
-  { to: '/app/insights', label: 'Insights', icon: BarChart3 },
+const mobileNav: Array<{ to: string; labelKey: TranslationKey; icon: any }> = [
+  { to: '/app/home', labelKey: 'home', icon: Home },
+  { to: '/app/check-in', labelKey: 'checkIn', icon: Heart },
+  { to: '/app/chat', labelKey: 'chat', icon: MessageCircle },
+  { to: '/app/journal', labelKey: 'journal', icon: BookOpen },
+  { to: '/app/insights', labelKey: 'insights', icon: BarChart3 },
 ];
 
 export function AppMobileNav() {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { t } = useLanguage();
 
   return (
     <>
@@ -30,7 +33,7 @@ export function AppMobileNav() {
                 }`}
               >
                 <item.icon className="w-5 h-5" />
-                {item.label}
+                {t(item.labelKey)}
               </a>
             );
           })}
@@ -39,7 +42,7 @@ export function AppMobileNav() {
             className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg text-[10px] font-medium text-muted-foreground"
           >
             <Menu className="w-5 h-5" />
-            More
+            {t('more')}
           </button>
         </div>
       </nav>

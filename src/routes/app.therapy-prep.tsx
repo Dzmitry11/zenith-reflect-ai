@@ -4,7 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/EmptyState';
-import { Plus, Copy, Printer } from 'lucide-react';
+import { Plus, Copy } from 'lucide-react';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 export const Route = createFileRoute('/app/therapy-prep')({
   component: TherapyPrepPage,
@@ -12,6 +13,7 @@ export const Route = createFileRoute('/app/therapy-prep')({
 
 function TherapyPrepPage() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [notes, setNotes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<any>(null);
@@ -51,11 +53,11 @@ function TherapyPrepPage() {
 
   const generateSummary = () => {
     const parts: string[] = [];
-    if (form.key_events) parts.push(`Key events: ${form.key_events}`);
-    if (form.repeated_triggers) parts.push(`Triggers: ${form.repeated_triggers}`);
-    if (form.emotions) parts.push(`Emotions: ${form.emotions}`);
-    if (form.questions_for_therapist) parts.push(`Questions: ${form.questions_for_therapist}`);
-    if (form.hard_to_say) parts.push(`Hard to say: ${form.hard_to_say}`);
+    if (form.key_events) parts.push(`${t('keyEvents')}: ${form.key_events}`);
+    if (form.repeated_triggers) parts.push(`${t('repeatedTriggers')}: ${form.repeated_triggers}`);
+    if (form.emotions) parts.push(`${t('emotionsCameUp')}: ${form.emotions}`);
+    if (form.questions_for_therapist) parts.push(`${t('questionsForTherapist')}: ${form.questions_for_therapist}`);
+    if (form.hard_to_say) parts.push(`${t('hardToSay')}: ${form.hard_to_say}`);
     return parts.join('\n\n');
   };
 
@@ -78,25 +80,27 @@ function TherapyPrepPage() {
   const [showForm, setShowForm] = useState(false);
 
   if (showForm || editing) {
+    const fields = [
+      { key: 'key_events', label: t('keyEvents'), placeholder: t('keyEventsPlaceholder') },
+      { key: 'repeated_triggers', label: t('repeatedTriggers'), placeholder: t('triggersPlaceholder') },
+      { key: 'emotions', label: t('emotionsCameUp'), placeholder: t('emotionsPlaceholder') },
+      { key: 'questions_for_therapist', label: t('questionsForTherapist'), placeholder: t('questionsPlaceholder') },
+      { key: 'hard_to_say', label: t('hardToSay'), placeholder: t('hardToSayPlaceholder') },
+    ] as const;
+
     return (
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-display font-semibold text-foreground">{editing ? 'Edit therapy prep' : 'New therapy prep'}</h1>
-          <Button variant="ghost" size="sm" onClick={() => { setShowForm(false); setEditing(null); }}>Cancel</Button>
+          <h1 className="text-xl font-display font-semibold text-foreground">{editing ? t('editTherapyPrep') : t('newTherapyPrep')}</h1>
+          <Button variant="ghost" size="sm" onClick={() => { setShowForm(false); setEditing(null); }}>{t('cancel')}</Button>
         </div>
 
         <div className="space-y-5">
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">Upcoming session date</label>
+            <label className="text-sm font-medium text-foreground mb-1.5 block">{t('upcomingDate')}</label>
             <input type="date" value={form.upcoming_session_date} onChange={(e) => setForm({ ...form, upcoming_session_date: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
           </div>
-          {([
-            { key: 'key_events', label: 'Key events since last session', placeholder: 'What has happened that feels significant?' },
-            { key: 'repeated_triggers', label: 'Repeated triggers', placeholder: 'Have you noticed patterns or recurring situations?' },
-            { key: 'emotions', label: 'Emotions that came up', placeholder: 'What have you been feeling most?' },
-            { key: 'questions_for_therapist', label: 'Questions for your therapist', placeholder: 'What would you like to explore or ask about?' },
-            { key: 'hard_to_say', label: 'What feels hard to say', placeholder: 'Is there something you want to bring up but find difficult?' },
-          ] as const).map((field) => (
+          {fields.map((field) => (
             <div key={field.key}>
               <label className="text-sm font-medium text-foreground mb-1.5 block">{field.label}</label>
               <textarea
@@ -108,7 +112,7 @@ function TherapyPrepPage() {
               />
             </div>
           ))}
-          <Button onClick={handleSave} disabled={saving} className="w-full">{saving ? 'Saving...' : 'Save therapy prep'}</Button>
+          <Button onClick={handleSave} disabled={saving} className="w-full">{saving ? t('saving') : t('saveTherapyPrep')}</Button>
         </div>
       </div>
     );
@@ -117,20 +121,20 @@ function TherapyPrepPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-display font-semibold text-foreground">Therapy Prep</h1>
-        <Button onClick={() => setShowForm(true)} size="sm"><Plus className="w-4 h-4" /> New prep</Button>
+        <h1 className="text-2xl font-display font-semibold text-foreground">{t('therapyPrep')}</h1>
+        <Button onClick={() => setShowForm(true)} size="sm"><Plus className="w-4 h-4" /> {t('newPrep')}</Button>
       </div>
 
-      <p className="text-sm text-muted-foreground">Organize your thoughts before your next session. Your therapist will appreciate the clarity.</p>
+      <p className="text-sm text-muted-foreground">{t('therapyPrepDesc')}</p>
 
       {loading ? (
-        <div className="text-sm text-muted-foreground text-center py-8">Loading...</div>
+        <div className="text-sm text-muted-foreground text-center py-8">{t('loading')}</div>
       ) : notes.length === 0 ? (
         <EmptyState
           icon="📋"
-          title="No therapy prep notes yet"
-          description="Preparing for therapy can help you make the most of your time. Start by jotting down what is on your mind."
-          action={<Button onClick={() => setShowForm(true)}>Create your first prep</Button>}
+          title={t('noTherapyNotes')}
+          description={t('therapyNotesEmpty')}
+          action={<Button onClick={() => setShowForm(true)}>{t('createFirstPrep')}</Button>}
         />
       ) : (
         <div className="space-y-4">
@@ -138,7 +142,7 @@ function TherapyPrepPage() {
             <div key={note.id} className="rounded-2xl bg-card border border-border p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-xs text-muted-foreground">{note.upcoming_session_date ? `Session: ${note.upcoming_session_date}` : 'No date set'}</span>
+                  <span className="text-xs text-muted-foreground">{note.upcoming_session_date ? `${t('upcomingDate')}: ${note.upcoming_session_date}` : t('noDateSet')}</span>
                   <p className="text-xs text-muted-foreground">{new Date(note.created_at).toLocaleDateString()}</p>
                 </div>
                 <div className="flex gap-1">
@@ -148,7 +152,7 @@ function TherapyPrepPage() {
               </div>
               {note.generated_summary && (
                 <div className="rounded-xl bg-surface p-4">
-                  <p className="text-xs font-medium text-foreground mb-2">Summary</p>
+                  <p className="text-xs font-medium text-foreground mb-2">{t('summary')}</p>
                   <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-body">{note.generated_summary}</pre>
                 </div>
               )}

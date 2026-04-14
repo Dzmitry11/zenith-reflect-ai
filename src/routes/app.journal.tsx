@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { JOURNAL_TEMPLATES } from '@/types';
 import { EmptyState } from '@/components/EmptyState';
 import { Plus, BookOpen, Trash2, Search } from 'lucide-react';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 export const Route = createFileRoute('/app/journal')({
   component: JournalPage,
@@ -13,6 +14,7 @@ export const Route = createFileRoute('/app/journal')({
 
 function JournalPage() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [entries, setEntries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -70,25 +72,25 @@ function JournalPage() {
   );
 
   if (showCreate) {
-    const template = JOURNAL_TEMPLATES.find((t) => t.id === selectedTemplate);
+    const template = JOURNAL_TEMPLATES.find((tp) => tp.id === selectedTemplate);
     return (
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-display font-semibold text-foreground">{editEntry ? 'Edit entry' : 'New journal entry'}</h1>
-          <Button variant="ghost" size="sm" onClick={() => { setShowCreate(false); setEditEntry(null); setTitle(''); setContent(''); }}>Cancel</Button>
+          <h1 className="text-xl font-display font-semibold text-foreground">{editEntry ? t('editEntry') : t('newJournalEntry')}</h1>
+          <Button variant="ghost" size="sm" onClick={() => { setShowCreate(false); setEditEntry(null); setTitle(''); setContent(''); }}>{t('cancel')}</Button>
         </div>
 
         {!selectedTemplate && !editEntry && (
           <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">Choose a template or write freely.</p>
+            <p className="text-sm text-muted-foreground">{t('chooseTemplate')}</p>
             <button onClick={() => setSelectedTemplate('free')} className="w-full text-left p-4 rounded-xl bg-card border border-border hover:border-primary/30 transition-all">
-              <span className="text-sm font-medium text-foreground">✍️ Free writing</span>
-              <p className="text-xs text-muted-foreground mt-0.5">Write whatever comes to mind.</p>
+              <span className="text-sm font-medium text-foreground">✍️ {t('freeWriting')}</span>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('freeWritingDesc')}</p>
             </button>
-            {JOURNAL_TEMPLATES.map((t) => (
-              <button key={t.id} onClick={() => setSelectedTemplate(t.id)} className="w-full text-left p-4 rounded-xl bg-card border border-border hover:border-primary/30 transition-all">
-                <span className="text-sm font-medium text-foreground">{t.icon} {t.title}</span>
-                <p className="text-xs text-muted-foreground mt-0.5">{t.description}</p>
+            {JOURNAL_TEMPLATES.map((tp) => (
+              <button key={tp.id} onClick={() => setSelectedTemplate(tp.id)} className="w-full text-left p-4 rounded-xl bg-card border border-border hover:border-primary/30 transition-all">
+                <span className="text-sm font-medium text-foreground">{tp.icon} {tp.title}</span>
+                <p className="text-xs text-muted-foreground mt-0.5">{tp.description}</p>
               </button>
             ))}
           </div>
@@ -98,7 +100,7 @@ function JournalPage() {
           <div className="space-y-4">
             {template && (
               <div className="rounded-xl bg-calm/10 border border-calm/20 p-4">
-                <p className="text-xs font-medium text-foreground mb-2">Guiding prompts</p>
+                <p className="text-xs font-medium text-foreground mb-2">{t('guidingPrompts')}</p>
                 <ul className="space-y-1">
                   {template.prompts.map((p, i) => (
                     <li key={i} className="text-xs text-muted-foreground">• {p}</li>
@@ -109,18 +111,18 @@ function JournalPage() {
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Entry title"
+              placeholder={t('entryTitle')}
               className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Start writing..."
+              placeholder={t('startWriting')}
               rows={12}
               className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring leading-relaxed"
             />
             <Button onClick={handleSave} disabled={saving || !title.trim() || !content.trim()} className="w-full">
-              {saving ? 'Saving...' : editEntry ? 'Update entry' : 'Save entry'}
+              {saving ? t('saving') : editEntry ? t('updateEntry') : t('saveEntry')}
             </Button>
           </div>
         )}
@@ -131,8 +133,8 @@ function JournalPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-display font-semibold text-foreground">Journal</h1>
-        <Button onClick={() => setShowCreate(true)} size="sm"><Plus className="w-4 h-4" /> New entry</Button>
+        <h1 className="text-2xl font-display font-semibold text-foreground">{t('journal')}</h1>
+        <Button onClick={() => setShowCreate(true)} size="sm"><Plus className="w-4 h-4" /> {t('newEntry')}</Button>
       </div>
 
       <div className="flex gap-2">
@@ -141,29 +143,29 @@ function JournalPage() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search entries..."
+            placeholder={t('searchEntries')}
             className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
       </div>
 
       <div className="flex gap-2 flex-wrap">
-        <button onClick={() => setFilter('')} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!filter ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}>All</button>
-        {JOURNAL_TEMPLATES.map((t) => (
-          <button key={t.id} onClick={() => setFilter(t.id)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filter === t.id ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}>
-            {t.icon} {t.title}
+        <button onClick={() => setFilter('')} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!filter ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}>{t('all')}</button>
+        {JOURNAL_TEMPLATES.map((tp) => (
+          <button key={tp.id} onClick={() => setFilter(tp.id)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filter === tp.id ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}>
+            {tp.icon} {tp.title}
           </button>
         ))}
       </div>
 
       {loading ? (
-        <div className="text-sm text-muted-foreground text-center py-8">Loading...</div>
+        <div className="text-sm text-muted-foreground text-center py-8">{t('loading')}</div>
       ) : filteredEntries.length === 0 ? (
         <EmptyState
           icon="📝"
-          title="No journal entries yet"
-          description="Writing things down can help them feel more manageable. Start with a template or write freely."
-          action={<Button onClick={() => setShowCreate(true)}>Create your first entry</Button>}
+          title={t('noJournalEntries')}
+          description={t('journalEmpty')}
+          action={<Button onClick={() => setShowCreate(true)}>{t('createFirstEntry')}</Button>}
         />
       ) : (
         <div className="space-y-3">

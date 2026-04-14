@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { STARTER_CHIPS } from '@/types';
 import type { SessionMode } from '@/types';
 import { Plus, MessageCircle } from 'lucide-react';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 export const Route = createFileRoute('/app/chat/')({
   component: ChatListPage,
@@ -13,6 +14,7 @@ export const Route = createFileRoute('/app/chat/')({
 
 function ChatListPage() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [sessions, setSessions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -47,14 +49,14 @@ function ChatListPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-display font-semibold text-foreground">Chat</h1>
+        <h1 className="text-2xl font-display font-semibold text-foreground">{t('chat')}</h1>
         <Button onClick={() => createSession()} disabled={creating} size="sm">
-          <Plus className="w-4 h-4" /> New session
+          <Plus className="w-4 h-4" /> {t('newSession')}
         </Button>
       </div>
 
       <div>
-        <p className="text-sm text-muted-foreground mb-3">Start with a prompt</p>
+        <p className="text-sm text-muted-foreground mb-3">{t('startWithPrompt')}</p>
         <div className="flex flex-wrap gap-2">
           {STARTER_CHIPS.map((chip) => (
             <button
@@ -69,13 +71,13 @@ function ChatListPage() {
       </div>
 
       <div>
-        <h2 className="text-sm font-medium text-foreground mb-3">Choose a mode</h2>
+        <h2 className="text-sm font-medium text-foreground mb-3">{t('chooseMode')}</h2>
         <div className="grid grid-cols-2 gap-2">
           {([
-            { mode: 'checkin' as SessionMode, label: 'Check-in', desc: 'Quick emotional check' },
-            { mode: 'situation_breakdown' as SessionMode, label: 'Situation breakdown', desc: 'Break down what happened' },
-            { mode: 'journal' as SessionMode, label: 'Guided journal', desc: 'Structured journaling' },
-            { mode: 'therapy_prep' as SessionMode, label: 'Therapy prep', desc: 'Prepare for your session' },
+            { mode: 'checkin' as SessionMode, label: t('checkIn'), desc: t('quickCheck') },
+            { mode: 'situation_breakdown' as SessionMode, label: t('situationBreakdown'), desc: t('breakDown') },
+            { mode: 'journal' as SessionMode, label: t('guidedJournal'), desc: t('structuredJournaling') },
+            { mode: 'therapy_prep' as SessionMode, label: t('therapyPrep'), desc: t('prepareSession') },
           ]).map((item) => (
             <button
               key={item.mode}
@@ -90,19 +92,19 @@ function ChatListPage() {
       </div>
 
       {loading ? (
-        <div className="text-sm text-muted-foreground text-center py-8">Loading sessions...</div>
+        <div className="text-sm text-muted-foreground text-center py-8">{t('loadingSessions')}</div>
       ) : sessions.length === 0 ? (
         <div className="text-center py-12 space-y-3">
           <MessageCircle className="w-8 h-8 text-muted-foreground mx-auto" />
-          <p className="text-sm text-muted-foreground">No sessions yet. Start your first one above.</p>
+          <p className="text-sm text-muted-foreground">{t('noSessionsYet')}</p>
         </div>
       ) : (
         <div className="space-y-2">
-          <h2 className="text-sm font-medium text-foreground">Previous sessions</h2>
+          <h2 className="text-sm font-medium text-foreground">{t('previousSessions')}</h2>
           {sessions.map((s) => (
             <a key={s.id} href={`/app/chat/${s.id}`} className="block p-4 rounded-xl bg-card border border-border hover:border-primary/20 transition-all">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-foreground">{s.title || 'Untitled'}</span>
+                <span className="text-sm font-medium text-foreground">{s.title || t('untitledSession')}</span>
                 <span className="text-xs text-muted-foreground">{new Date(s.created_at).toLocaleDateString()}</span>
               </div>
               <div className="flex gap-2 mt-1">

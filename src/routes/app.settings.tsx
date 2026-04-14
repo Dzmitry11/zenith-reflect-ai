@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { CompanionAvatarPicker, type CompanionId } from '@/components/CompanionAvatarPicker';
+import { useLanguage } from '@/i18n/LanguageContext';
+import { LOCALE_LABELS, type Locale } from '@/i18n/translations';
 
 export const Route = createFileRoute('/app/settings')({
   component: SettingsPage,
@@ -11,6 +13,7 @@ export const Route = createFileRoute('/app/settings')({
 
 function SettingsPage() {
   const { user } = useAuth();
+  const { t, locale, setLocale } = useLanguage();
   const [prefs, setPrefs] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [saving, setSaving] = useState(false);
@@ -42,15 +45,26 @@ function SettingsPage() {
     setSaving(false);
   };
 
-  if (!prefs || !profile) return <div className="text-sm text-muted-foreground text-center py-20">Loading...</div>;
+  if (!prefs || !profile) return <div className="text-sm text-muted-foreground text-center py-20">{t('loading')}</div>;
 
   return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-8">
-      <h1 className="text-2xl font-display font-semibold text-foreground">Settings</h1>
+      <h1 className="text-2xl font-display font-semibold text-foreground">{t('settings')}</h1>
 
       <div className="space-y-5">
         <div>
-          <label className="text-sm font-medium text-foreground mb-1.5 block">Display name</label>
+          <label className="text-sm font-medium text-foreground mb-1.5 block">{t('language')}</label>
+          <div className="flex gap-2">
+            {(['en', 'sv', 'ru'] as Locale[]).map((loc) => (
+              <button key={loc} onClick={() => setLocale(loc)} className={`flex-1 py-3 rounded-xl text-sm border transition-all ${locale === loc ? 'bg-primary/10 border-primary text-primary font-medium' : 'bg-card border-border text-foreground'}`}>
+                {LOCALE_LABELS[loc]}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-foreground mb-1.5 block">{t('displayName')}</label>
           <input value={profile.display_name || ''} onChange={(e) => setProfile({ ...profile, display_name: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
         </div>
 
@@ -60,12 +74,12 @@ function SettingsPage() {
         />
 
         <div>
-          <label className="text-sm font-medium text-foreground mb-1.5 block">Tone preference</label>
+          <label className="text-sm font-medium text-foreground mb-1.5 block">{t('tonePreference')}</label>
           <div className="space-y-2">
             {[
-              { value: 'warm_and_gentle', label: 'Warm and gentle' },
-              { value: 'warm_and_structured', label: 'Warm and structured' },
-              { value: 'concise_and_grounding', label: 'Concise and grounding' },
+              { value: 'warm_and_gentle', label: t('warmGentle') },
+              { value: 'warm_and_structured', label: t('warmStructured') },
+              { value: 'concise_and_grounding', label: t('conciseGrounding') },
             ].map((opt) => (
               <button key={opt.value} onClick={() => setPrefs({ ...prefs, tone_preference: opt.value })} className={`w-full text-left px-4 py-3 rounded-xl text-sm border transition-all ${prefs.tone_preference === opt.value ? 'bg-primary/10 border-primary text-primary font-medium' : 'bg-card border-border text-foreground'}`}>
                 {opt.label}
@@ -75,7 +89,7 @@ function SettingsPage() {
         </div>
 
         <div>
-          <label className="text-sm font-medium text-foreground mb-1.5 block">Preferred session length</label>
+          <label className="text-sm font-medium text-foreground mb-1.5 block">{t('sessionLength')}</label>
           <div className="flex gap-2">
             {['5', '10', '15'].map((len) => (
               <button key={len} onClick={() => setPrefs({ ...prefs, preferred_session_length: len })} className={`flex-1 py-3 rounded-xl text-sm border transition-all ${prefs.preferred_session_length === len ? 'bg-primary/10 border-primary text-primary font-medium' : 'bg-card border-border text-foreground'}`}>
@@ -87,13 +101,13 @@ function SettingsPage() {
 
         <div className="space-y-3">
           <label className="flex items-center justify-between">
-            <span className="text-sm text-foreground">Enable memory</span>
+            <span className="text-sm text-foreground">{t('enableMemory')}</span>
             <button onClick={() => setPrefs({ ...prefs, memory_enabled: !prefs.memory_enabled })} className={`w-10 h-6 rounded-full transition-colors ${prefs.memory_enabled ? 'bg-primary' : 'bg-border'}`}>
               <div className={`w-4 h-4 rounded-full bg-white shadow transition-transform mx-1 ${prefs.memory_enabled ? 'translate-x-4' : ''}`} />
             </button>
           </label>
           <label className="flex items-center justify-between">
-            <span className="text-sm text-foreground">Weekly summaries</span>
+            <span className="text-sm text-foreground">{t('weeklySummaries')}</span>
             <button onClick={() => setPrefs({ ...prefs, weekly_summary_enabled: !prefs.weekly_summary_enabled })} className={`w-10 h-6 rounded-full transition-colors ${prefs.weekly_summary_enabled ? 'bg-primary' : 'bg-border'}`}>
               <div className={`w-4 h-4 rounded-full bg-white shadow transition-transform mx-1 ${prefs.weekly_summary_enabled ? 'translate-x-4' : ''}`} />
             </button>
@@ -101,10 +115,10 @@ function SettingsPage() {
         </div>
       </div>
 
-      <Button onClick={handleSave} disabled={saving} className="w-full">{saving ? 'Saving...' : 'Save changes'}</Button>
+      <Button onClick={handleSave} disabled={saving} className="w-full">{saving ? t('saving') : t('saveChanges')}</Button>
 
       <div className="rounded-xl bg-muted p-4">
-        <p className="text-xs text-muted-foreground">Reflecta is designed for self-reflection and emotional clarity. It is not therapy, not a diagnostic tool, and not crisis support.</p>
+        <p className="text-xs text-muted-foreground">{t('settingsDisclaimer')}</p>
       </div>
     </div>
   );
