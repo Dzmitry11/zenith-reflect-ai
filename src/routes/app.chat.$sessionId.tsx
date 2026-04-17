@@ -394,6 +394,12 @@ function ChatSessionPage() {
             isLatestAssistant={msg.id === latestAssistantId && msg.role === 'assistant'}
             companionAvatar={companionAvatar}
             companionName={companionName}
+            companionId={companionId}
+            onSpeak={handleSpeak}
+            isSpeaking={speakingId === msg.id}
+            ttsSupported={ttsSupported}
+            playLabel={t('playMessage')}
+            stopLabel={t('stopPlayback')}
           />
         ))}
 
