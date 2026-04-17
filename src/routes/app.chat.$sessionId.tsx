@@ -43,7 +43,29 @@ function useTypingEffect(text: string, speed = 18) {
 }
 
 /* ── Single message bubble ── */
-function MessageBubble({ msg, isLatestAssistant, companionAvatar, companionName }: { msg: any; isLatestAssistant: boolean; companionAvatar: string; companionName: string }) {
+function MessageBubble({
+  msg,
+  isLatestAssistant,
+  companionAvatar,
+  companionName,
+  companionId,
+  onSpeak,
+  isSpeaking,
+  ttsSupported,
+  playLabel,
+  stopLabel,
+}: {
+  msg: any;
+  isLatestAssistant: boolean;
+  companionAvatar: string;
+  companionName: string;
+  companionId: 'aurora' | 'marcus';
+  onSpeak: (id: string, text: string) => void;
+  isSpeaking: boolean;
+  ttsSupported: boolean;
+  playLabel: string;
+  stopLabel: string;
+}) {
   const isUser = msg.role === 'user';
   const { displayed, done } = useTypingEffect(
     isLatestAssistant ? msg.content : msg.content,
@@ -69,20 +91,34 @@ function MessageBubble({ msg, isLatestAssistant, companionAvatar, companionName 
           height={32}
         />
       )}
-      <div
-        className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
-          isUser
-            ? 'bg-primary text-primary-foreground rounded-br-md'
-            : 'bg-card/60 backdrop-blur-md border border-border/50 text-foreground rounded-bl-md'
-        }`}
-      >
-        {text}
-        {isLatestAssistant && !done && (
-          <motion.span
-            animate={{ opacity: [1, 0] }}
-            transition={{ repeat: Infinity, duration: 0.6 }}
-            className="inline-block w-[2px] h-[1em] bg-foreground/60 ml-0.5 align-text-bottom"
-          />
+      <div className={`flex flex-col gap-1 max-w-[75%] ${isUser ? 'items-end' : 'items-start'}`}>
+        <div
+          className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+            isUser
+              ? 'bg-primary text-primary-foreground rounded-br-md'
+              : 'bg-card/60 backdrop-blur-md border border-border/50 text-foreground rounded-bl-md'
+          }`}
+        >
+          {text}
+          {isLatestAssistant && !done && (
+            <motion.span
+              animate={{ opacity: [1, 0] }}
+              transition={{ repeat: Infinity, duration: 0.6 }}
+              className="inline-block w-[2px] h-[1em] bg-foreground/60 ml-0.5 align-text-bottom"
+            />
+          )}
+        </div>
+        {!isUser && ttsSupported && done && (
+          <button
+            type="button"
+            onClick={() => onSpeak(msg.id, msg.content)}
+            aria-label={isSpeaking ? stopLabel : playLabel}
+            title={isSpeaking ? stopLabel : playLabel}
+            className="flex items-center gap-1 px-2 py-1 rounded-full text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+          >
+            {isSpeaking ? <Square className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
+            <span>{isSpeaking ? stopLabel : playLabel}</span>
+          </button>
         )}
       </div>
     </motion.div>
