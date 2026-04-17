@@ -247,7 +247,9 @@ function ChatSessionPage() {
       ]);
       if (sessionRes.data) setSession(sessionRes.data);
       if (messagesRes.data) setMessages(messagesRes.data);
-      if (prefsRes.data?.companion_avatar) setCompanionId(prefsRes.data.companion_avatar);
+      if (prefsRes.data?.companion_avatar === 'marcus' || prefsRes.data?.companion_avatar === 'aurora') {
+        setCompanionId(prefsRes.data.companion_avatar);
+      }
     };
     load();
   }, [user, sessionId]);
