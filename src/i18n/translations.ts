@@ -430,6 +430,14 @@ const sv: typeof en = {
   consentEmergency: 'Vid nödsituationer, kontakta lokala akuttjänster',
   settingUp: 'Konfigurerar...',
   startReflecting: 'Börja reflektera',
+
+  playMessage: 'Spela upp meddelande',
+  stopPlayback: 'Stoppa uppspelning',
+  startVoiceInput: 'Starta röstinmatning',
+  stopVoiceInput: 'Stoppa röstinmatning',
+  voiceNotSupported: 'Röstfunktioner stöds inte i denna webbläsare',
+  micPermissionDenied: 'Mikrofonåtkomst nekades',
+  listening: 'Lyssnar...',
 };
 
 const ru: typeof en = {
