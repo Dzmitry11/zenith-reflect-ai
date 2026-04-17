@@ -430,10 +430,22 @@ function ChatSessionPage() {
               value={input}
               onChange={(e) => { setInput(e.target.value); autoResize(); }}
               onKeyDown={handleKeyDown}
-              placeholder="Share what's on your mind..."
+              placeholder={isListening ? t('listening') : "Share what's on your mind..."}
               rows={1}
               className="flex-1 resize-none rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
+            {sttSupported && (
+              <Button
+                size="icon"
+                variant={isListening ? 'default' : 'outline'}
+                onClick={toggleMic}
+                aria-label={isListening ? t('stopVoiceInput') : t('startVoiceInput')}
+                title={isListening ? t('stopVoiceInput') : t('startVoiceInput')}
+                className={isListening ? 'animate-pulse' : ''}
+              >
+                {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              </Button>
+            )}
             <Button size="icon" onClick={() => sendMessage(input)} disabled={!input.trim() || sending}>
               <Send className="w-4 h-4" />
             </Button>
