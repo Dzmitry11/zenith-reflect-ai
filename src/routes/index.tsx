@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Brain, ClipboardList, BarChart3, Shield, ChevronRight, Check } from 'lucide-react';
 import { FadeIn, StaggerContainer, StaggerItem, ScaleIn } from '@/components/animations';
+import { CompanionInvite } from '@/components/CompanionInvite';
 import bgLanding from '@/assets/bg-landing.jpg';
 
 export const Route = createFileRoute('/')({
@@ -52,6 +53,7 @@ function LandingPage() {
               Reflect, journal, and prepare for therapy with structured support. Emotional clarity, one conversation at a time.
             </p>
           </FadeIn>
+          <CompanionInvite />
           <FadeIn delay={0.55} duration={0.6}>
             <div className="flex gap-3 justify-center mt-8">
               <a href="/signup"><Button size="lg" variant="hero">Start reflecting <ChevronRight className="w-4 h-4" /></Button></a>
