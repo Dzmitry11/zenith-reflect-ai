@@ -14,7 +14,11 @@ function OnboardingPage() {
   const { t, locale, setLocale } = useLanguage();
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
-  const [companion, setCompanion] = useState<CompanionId>('aurora');
+  const [companion, setCompanion] = useState<CompanionId>(() => {
+    if (typeof window === 'undefined') return 'aurora';
+    const stored = localStorage.getItem('reflecta:preferred_companion');
+    return stored === 'marcus' ? 'marcus' : 'aurora';
+  });
   const [tone, setTone] = useState('warm_and_gentle');
   const [goal, setGoal] = useState('');
   const [sessionLen, setSessionLen] = useState('10');
