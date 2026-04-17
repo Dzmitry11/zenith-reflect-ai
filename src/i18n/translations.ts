@@ -224,6 +224,15 @@ const en = {
   consentEmergency: 'For emergencies, contact local emergency services',
   settingUp: 'Setting up...',
   startReflecting: 'Start reflecting',
+
+  // Voice
+  playMessage: 'Play message',
+  stopPlayback: 'Stop playback',
+  startVoiceInput: 'Start voice input',
+  stopVoiceInput: 'Stop voice input',
+  voiceNotSupported: 'Voice features are not supported in this browser',
+  micPermissionDenied: 'Microphone access was denied',
+  listening: 'Listening...',
 };
 
 const sv: typeof en = {
