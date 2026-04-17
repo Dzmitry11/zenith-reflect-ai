@@ -166,18 +166,76 @@ function TypingDots({ companionAvatar, companionName }: { companionAvatar: strin
 function ChatSessionPage() {
   const { sessionId } = Route.useParams();
   const { user } = useAuth();
+  const { t, locale } = useLanguage();
   const [session, setSession] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [riskLevel, setRiskLevel] = useState<RiskLevel>('green');
   const [latestAssistantId, setLatestAssistantId] = useState<string | null>(null);
-  const [companionId, setCompanionId] = useState('aurora');
+  const [companionId, setCompanionId] = useState<'aurora' | 'marcus'>('aurora');
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<{ stop: () => void } | null>(null);
+  const inputBeforeMicRef = useRef('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const ttsSupported = isTTSSupported();
+  const sttSupported = isSTTSupported();
   const companionAvatar = getCompanionAvatar(companionId);
   const companionName = getCompanionName(companionId);
+
+  useEffect(() => {
+    return () => {
+      stopSpeaking();
+      recognitionRef.current?.stop();
+    };
+  }, []);
+
+  const handleSpeak = (id: string, text: string) => {
+    if (speakingId === id) {
+      stopSpeaking();
+      setSpeakingId(null);
+      return;
+    }
+    setSpeakingId(id);
+    speak(text, companionId, locale, {
+      onEnd: () => setSpeakingId((curr) => (curr === id ? null : curr)),
+      onError: () => setSpeakingId((curr) => (curr === id ? null : curr)),
+    });
+  };
+
+  const toggleMic = () => {
+    if (!sttSupported) {
+      toast.error(t('voiceNotSupported'));
+      return;
+    }
+    if (isListening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+    inputBeforeMicRef.current = input ? input.trimEnd() + ' ' : '';
+    setIsListening(true);
+    const handle = startRecognition(locale, {
+      onResult: (text) => setInput(inputBeforeMicRef.current + text),
+      onEnd: () => {
+        setIsListening(false);
+        recognitionRef.current = null;
+      },
+      onError: (err) => {
+        setIsListening(false);
+        recognitionRef.current = null;
+        if (err === 'not-allowed' || err === 'service-not-allowed') {
+          toast.error(t('micPermissionDenied'));
+        } else if (err === 'not-supported') {
+          toast.error(t('voiceNotSupported'));
+        }
+      },
+    });
+    recognitionRef.current = handle;
+    if (!handle) setIsListening(false);
+  };
 
   useEffect(() => {
     if (!user) return;
