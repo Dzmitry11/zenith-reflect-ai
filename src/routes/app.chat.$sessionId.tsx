@@ -8,9 +8,12 @@ import { createAssistantReply, summarizeSession } from '@/services/response-engi
 import { classifyRiskLevel } from '@/services/risk-classifier';
 import { STARTER_CHIPS } from '@/types';
 import type { SessionMode, RiskLevel } from '@/types';
-import { Send, ArrowLeft } from 'lucide-react';
+import { Send, ArrowLeft, Volume2, Square, Mic, MicOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getCompanionAvatar, getCompanionName } from '@/components/CompanionAvatarPicker';
+import { useLanguage } from '@/i18n/LanguageContext';
+import { speak, stopSpeaking, startRecognition, isTTSSupported, isSTTSupported } from '@/services/voice';
+import { toast } from 'sonner';
 
 export const Route = createFileRoute('/app/chat/$sessionId')({
   component: ChatSessionPage,
@@ -40,7 +43,29 @@ function useTypingEffect(text: string, speed = 18) {
 }
 
 /* ── Single message bubble ── */
-function MessageBubble({ msg, isLatestAssistant, companionAvatar, companionName }: { msg: any; isLatestAssistant: boolean; companionAvatar: string; companionName: string }) {
+function MessageBubble({
+  msg,
+  isLatestAssistant,
+  companionAvatar,
+  companionName,
+  companionId,
+  onSpeak,
+  isSpeaking,
+  ttsSupported,
+  playLabel,
+  stopLabel,
+}: {
+  msg: any;
+  isLatestAssistant: boolean;
+  companionAvatar: string;
+  companionName: string;
+  companionId: 'aurora' | 'marcus';
+  onSpeak: (id: string, text: string) => void;
+  isSpeaking: boolean;
+  ttsSupported: boolean;
+  playLabel: string;
+  stopLabel: string;
+}) {
   const isUser = msg.role === 'user';
   const { displayed, done } = useTypingEffect(
     isLatestAssistant ? msg.content : msg.content,
@@ -66,20 +91,34 @@ function MessageBubble({ msg, isLatestAssistant, companionAvatar, companionName 
           height={32}
         />
       )}
-      <div
-        className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
-          isUser
-            ? 'bg-primary text-primary-foreground rounded-br-md'
-            : 'bg-card/60 backdrop-blur-md border border-border/50 text-foreground rounded-bl-md'
-        }`}
-      >
-        {text}
-        {isLatestAssistant && !done && (
-          <motion.span
-            animate={{ opacity: [1, 0] }}
-            transition={{ repeat: Infinity, duration: 0.6 }}
-            className="inline-block w-[2px] h-[1em] bg-foreground/60 ml-0.5 align-text-bottom"
-          />
+      <div className={`flex flex-col gap-1 max-w-[75%] ${isUser ? 'items-end' : 'items-start'}`}>
+        <div
+          className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+            isUser
+              ? 'bg-primary text-primary-foreground rounded-br-md'
+              : 'bg-card/60 backdrop-blur-md border border-border/50 text-foreground rounded-bl-md'
+          }`}
+        >
+          {text}
+          {isLatestAssistant && !done && (
+            <motion.span
+              animate={{ opacity: [1, 0] }}
+              transition={{ repeat: Infinity, duration: 0.6 }}
+              className="inline-block w-[2px] h-[1em] bg-foreground/60 ml-0.5 align-text-bottom"
+            />
+          )}
+        </div>
+        {!isUser && ttsSupported && done && (
+          <button
+            type="button"
+            onClick={() => onSpeak(msg.id, msg.content)}
+            aria-label={isSpeaking ? stopLabel : playLabel}
+            title={isSpeaking ? stopLabel : playLabel}
+            className="flex items-center gap-1 px-2 py-1 rounded-full text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+          >
+            {isSpeaking ? <Square className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
+            <span>{isSpeaking ? stopLabel : playLabel}</span>
+          </button>
         )}
       </div>
     </motion.div>
@@ -127,18 +166,76 @@ function TypingDots({ companionAvatar, companionName }: { companionAvatar: strin
 function ChatSessionPage() {
   const { sessionId } = Route.useParams();
   const { user } = useAuth();
+  const { t, locale } = useLanguage();
   const [session, setSession] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [riskLevel, setRiskLevel] = useState<RiskLevel>('green');
   const [latestAssistantId, setLatestAssistantId] = useState<string | null>(null);
-  const [companionId, setCompanionId] = useState('aurora');
+  const [companionId, setCompanionId] = useState<'aurora' | 'marcus'>('aurora');
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<{ stop: () => void } | null>(null);
+  const inputBeforeMicRef = useRef('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const ttsSupported = isTTSSupported();
+  const sttSupported = isSTTSupported();
   const companionAvatar = getCompanionAvatar(companionId);
   const companionName = getCompanionName(companionId);
+
+  useEffect(() => {
+    return () => {
+      stopSpeaking();
+      recognitionRef.current?.stop();
+    };
+  }, []);
+
+  const handleSpeak = (id: string, text: string) => {
+    if (speakingId === id) {
+      stopSpeaking();
+      setSpeakingId(null);
+      return;
+    }
+    setSpeakingId(id);
+    speak(text, companionId, locale, {
+      onEnd: () => setSpeakingId((curr) => (curr === id ? null : curr)),
+      onError: () => setSpeakingId((curr) => (curr === id ? null : curr)),
+    });
+  };
+
+  const toggleMic = () => {
+    if (!sttSupported) {
+      toast.error(t('voiceNotSupported'));
+      return;
+    }
+    if (isListening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+    inputBeforeMicRef.current = input ? input.trimEnd() + ' ' : '';
+    setIsListening(true);
+    const handle = startRecognition(locale, {
+      onResult: (text) => setInput(inputBeforeMicRef.current + text),
+      onEnd: () => {
+        setIsListening(false);
+        recognitionRef.current = null;
+      },
+      onError: (err) => {
+        setIsListening(false);
+        recognitionRef.current = null;
+        if (err === 'not-allowed' || err === 'service-not-allowed') {
+          toast.error(t('micPermissionDenied'));
+        } else if (err === 'not-supported') {
+          toast.error(t('voiceNotSupported'));
+        }
+      },
+    });
+    recognitionRef.current = handle;
+    if (!handle) setIsListening(false);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -150,7 +247,9 @@ function ChatSessionPage() {
       ]);
       if (sessionRes.data) setSession(sessionRes.data);
       if (messagesRes.data) setMessages(messagesRes.data);
-      if (prefsRes.data?.companion_avatar) setCompanionId(prefsRes.data.companion_avatar);
+      if (prefsRes.data?.companion_avatar === 'marcus' || prefsRes.data?.companion_avatar === 'aurora') {
+        setCompanionId(prefsRes.data.companion_avatar);
+      }
     };
     load();
   }, [user, sessionId]);
@@ -295,6 +394,12 @@ function ChatSessionPage() {
             isLatestAssistant={msg.id === latestAssistantId && msg.role === 'assistant'}
             companionAvatar={companionAvatar}
             companionName={companionName}
+            companionId={companionId}
+            onSpeak={handleSpeak}
+            isSpeaking={speakingId === msg.id}
+            ttsSupported={ttsSupported}
+            playLabel={t('playMessage')}
+            stopLabel={t('stopPlayback')}
           />
         ))}
 
@@ -325,10 +430,22 @@ function ChatSessionPage() {
               value={input}
               onChange={(e) => { setInput(e.target.value); autoResize(); }}
               onKeyDown={handleKeyDown}
-              placeholder="Share what's on your mind..."
+              placeholder={isListening ? t('listening') : "Share what's on your mind..."}
               rows={1}
               className="flex-1 resize-none rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
+            {sttSupported && (
+              <Button
+                size="icon"
+                variant={isListening ? 'default' : 'outline'}
+                onClick={toggleMic}
+                aria-label={isListening ? t('stopVoiceInput') : t('startVoiceInput')}
+                title={isListening ? t('stopVoiceInput') : t('startVoiceInput')}
+                className={isListening ? 'animate-pulse' : ''}
+              >
+                {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              </Button>
+            )}
             <Button size="icon" onClick={() => sendMessage(input)} disabled={!input.trim() || sending}>
               <Send className="w-4 h-4" />
             </Button>

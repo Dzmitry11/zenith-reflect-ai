@@ -224,6 +224,15 @@ const en = {
   consentEmergency: 'For emergencies, contact local emergency services',
   settingUp: 'Setting up...',
   startReflecting: 'Start reflecting',
+
+  // Voice
+  playMessage: 'Play message',
+  stopPlayback: 'Stop playback',
+  startVoiceInput: 'Start voice input',
+  stopVoiceInput: 'Stop voice input',
+  voiceNotSupported: 'Voice features are not supported in this browser',
+  micPermissionDenied: 'Microphone access was denied',
+  listening: 'Listening...',
 };
 
 const sv: typeof en = {
@@ -421,6 +430,14 @@ const sv: typeof en = {
   consentEmergency: 'Vid nödsituationer, kontakta lokala akuttjänster',
   settingUp: 'Konfigurerar...',
   startReflecting: 'Börja reflektera',
+
+  playMessage: 'Spela upp meddelande',
+  stopPlayback: 'Stoppa uppspelning',
+  startVoiceInput: 'Starta röstinmatning',
+  stopVoiceInput: 'Stoppa röstinmatning',
+  voiceNotSupported: 'Röstfunktioner stöds inte i denna webbläsare',
+  micPermissionDenied: 'Mikrofonåtkomst nekades',
+  listening: 'Lyssnar...',
 };
 
 const ru: typeof en = {
@@ -618,6 +635,14 @@ const ru: typeof en = {
   consentEmergency: 'В экстренных случаях обращайтесь в местные экстренные службы',
   settingUp: 'Настройка...',
   startReflecting: 'Начать рефлексию',
+
+  playMessage: 'Озвучить сообщение',
+  stopPlayback: 'Остановить воспроизведение',
+  startVoiceInput: 'Начать голосовой ввод',
+  stopVoiceInput: 'Остановить голосовой ввод',
+  voiceNotSupported: 'Голосовые функции не поддерживаются в этом браузере',
+  micPermissionDenied: 'Доступ к микрофону отклонён',
+  listening: 'Слушаю...',
 };
 
 export const translations: Record<Locale, typeof en> = { en, sv, ru };
