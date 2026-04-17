@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import auroraSmile from '@/assets/avatar-aurora-smile.png';
+import auroraWink from '@/assets/avatar-aurora-wink.png';
 import marcusSmile from '@/assets/avatar-marcus-smile.png';
+import marcusTilt from '@/assets/avatar-marcus-tilt.png';
 
 type CompanionId = 'aurora' | 'marcus';
 
@@ -10,7 +13,11 @@ const COMPANIONS: Array<{
   name: string;
   tagline: string;
   src: string;
-  glow: string; // tailwind colour for the breathing halo
+  altSrc: string;
+  altDuration: number; // how long the alt frame stays visible (ms)
+  interval: number;    // time between expressions (ms)
+  startDelay: number;  // initial offset so they don't sync
+  glow: string;
   delay: number;
 }> = [
   {
@@ -18,6 +25,10 @@ const COMPANIONS: Array<{
     name: 'Aurora',
     tagline: 'Warm, gentle, here to listen',
     src: auroraSmile,
+    altSrc: auroraWink,
+    altDuration: 320,    // quick wink
+    interval: 5200,
+    startDelay: 1800,
     glow: 'from-amber-200/40 via-rose-200/30 to-purple-200/40',
     delay: 0,
   },
@@ -26,10 +37,43 @@ const COMPANIONS: Array<{
     name: 'Marcus',
     tagline: 'Calm, grounded, steady presence',
     src: marcusSmile,
+    altSrc: marcusTilt,
+    altDuration: 1400,   // longer thoughtful tilt
+    interval: 6400,
+    startDelay: 4200,
     glow: 'from-emerald-200/40 via-teal-200/30 to-sky-200/40',
     delay: 0.4,
   },
 ];
+
+/** Periodically swaps to an alt expression frame. */
+function useExpressionFrame(interval: number, altDuration: number, startDelay: number) {
+  const [showAlt, setShowAlt] = useState(false);
+
+  useEffect(() => {
+    let altTimeout: ReturnType<typeof setTimeout>;
+    const startTimeout = setTimeout(() => {
+      const tick = () => {
+        setShowAlt(true);
+        altTimeout = setTimeout(() => setShowAlt(false), altDuration);
+      };
+      tick();
+      const id = setInterval(tick, interval);
+      // cleanup for the interval is attached to the outer effect via closure
+      (startTimeout as any)._intervalId = id;
+    }, startDelay);
+
+    return () => {
+      clearTimeout(startTimeout);
+      clearTimeout(altTimeout);
+      const id = (startTimeout as any)._intervalId;
+      if (id) clearInterval(id);
+    };
+  }, [interval, altDuration, startDelay]);
+
+  return showAlt;
+}
+
 
 export function CompanionInvite() {
   const navigate = useNavigate();
