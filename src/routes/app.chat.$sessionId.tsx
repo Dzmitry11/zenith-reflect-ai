@@ -8,9 +8,12 @@ import { createAssistantReply, summarizeSession } from '@/services/response-engi
 import { classifyRiskLevel } from '@/services/risk-classifier';
 import { STARTER_CHIPS } from '@/types';
 import type { SessionMode, RiskLevel } from '@/types';
-import { Send, ArrowLeft } from 'lucide-react';
+import { Send, ArrowLeft, Volume2, Square, Mic, MicOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getCompanionAvatar, getCompanionName } from '@/components/CompanionAvatarPicker';
+import { useLanguage } from '@/i18n/LanguageContext';
+import { speak, stopSpeaking, startRecognition, isTTSSupported, isSTTSupported } from '@/services/voice';
+import { toast } from 'sonner';
 
 export const Route = createFileRoute('/app/chat/$sessionId')({
   component: ChatSessionPage,
