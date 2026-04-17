@@ -635,6 +635,14 @@ const ru: typeof en = {
   consentEmergency: 'В экстренных случаях обращайтесь в местные экстренные службы',
   settingUp: 'Настройка...',
   startReflecting: 'Начать рефлексию',
+
+  playMessage: 'Озвучить сообщение',
+  stopPlayback: 'Остановить воспроизведение',
+  startVoiceInput: 'Начать голосовой ввод',
+  stopVoiceInput: 'Остановить голосовой ввод',
+  voiceNotSupported: 'Голосовые функции не поддерживаются в этом браузере',
+  micPermissionDenied: 'Доступ к микрофону отклонён',
+  listening: 'Слушаю...',
 };
 
 export const translations: Record<Locale, typeof en> = { en, sv, ru };
