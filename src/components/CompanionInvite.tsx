@@ -46,15 +46,26 @@ const COMPANIONS: Array<{
   },
 ];
 
-/** Periodically swaps to an alt expression frame. */
+/** Random gesture offset to avoid identical repetition. */
+function randomGesture(base: number, variance: number) {
+  return base + (Math.random() - 0.5) * 2 * variance;
+}
+
+/** Periodically swaps to an alt expression frame with varied gesture. */
 function useExpressionFrame(interval: number, altDuration: number, startDelay: number) {
   const [showAlt, setShowAlt] = useState(false);
+  const [gesture, setGesture] = useState({ y: 0, x: 0, rotate: 0 });
 
   useEffect(() => {
     let altTimeout: ReturnType<typeof setTimeout>;
     let intervalId: ReturnType<typeof setInterval> | undefined;
     const startTimeout = setTimeout(() => {
       const tick = () => {
+        setGesture({
+          y: randomGesture(-2, 1.2),
+          x: randomGesture(0.8, 0.8),
+          rotate: randomGesture(0, 1.5),
+        });
         setShowAlt(true);
         altTimeout = setTimeout(() => setShowAlt(false), altDuration);
       };
@@ -69,7 +80,7 @@ function useExpressionFrame(interval: number, altDuration: number, startDelay: n
     };
   }, [interval, altDuration, startDelay]);
 
-  return showAlt;
+  return { showAlt, gesture };
 }
 
 
@@ -84,7 +95,7 @@ function CompanionCard({
   idx: number;
   onChoose: (id: CompanionId) => void;
 }) {
-  const showAlt = useExpressionFrame(c.interval, c.altDuration, c.startDelay);
+  const { showAlt, gesture } = useExpressionFrame(c.interval, c.altDuration, c.startDelay);
 
   return (
     <motion.button
@@ -134,7 +145,7 @@ function CompanionCard({
       >
         <motion.div
           animate={{
-            rotate: showAlt && c.id === 'aurora' ? -3 : 0,
+            rotate: showAlt && c.id === 'aurora' ? gesture.rotate - 3 : showAlt ? gesture.rotate * 0.4 : 0,
           }}
           transition={{ duration: 0.6, ease: 'easeInOut' }}
           className="w-28 h-36 sm:w-36 sm:h-44 rounded-2xl overflow-hidden ring-4 ring-background/80 shadow-xl group-hover:ring-primary/40 transition-all duration-500 relative"
@@ -148,8 +159,8 @@ function CompanionCard({
             height={640}
             loading="lazy"
             animate={{
-              y: showAlt ? (c.id === 'aurora' ? -2 : -1.5) : 0,
-              x: showAlt ? (c.id === 'aurora' ? 1 : -1) : 0,
+              y: showAlt ? gesture.y : 0,
+              x: showAlt ? gesture.x * (c.id === 'aurora' ? 1 : -1) : 0,
             }}
             transition={{ duration: c.id === 'marcus' ? 0.8 : 0.4, ease: 'easeInOut' }}
           />
@@ -167,8 +178,8 @@ function CompanionCard({
             height={640}
             loading="lazy"
             animate={{
-              y: showAlt ? (c.id === 'aurora' ? -2 : -1.5) : 0,
-              x: showAlt ? (c.id === 'aurora' ? 1 : -1) : 0,
+              y: showAlt ? gesture.y : 0,
+              x: showAlt ? gesture.x * (c.id === 'aurora' ? 1 : -1) : 0,
             }}
             transition={{ duration: c.id === 'marcus' ? 0.8 : 0.4, ease: 'easeInOut' }}
           />
