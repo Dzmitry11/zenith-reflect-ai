@@ -133,25 +133,32 @@ function CompanionCard({
         className="relative"
       >
         <motion.div
-          animate={{ rotate: showAlt && c.id === 'aurora' ? -3 : 0 }}
+          animate={{
+            rotate: showAlt && c.id === 'aurora' ? -3 : 0,
+          }}
           transition={{ duration: 0.6, ease: 'easeInOut' }}
           className="w-28 h-36 sm:w-36 sm:h-44 rounded-2xl overflow-hidden ring-4 ring-background/80 shadow-xl group-hover:ring-primary/40 transition-all duration-500 relative"
         >
-          {/* Base smile frame */}
-          <img
+          {/* Base smile frame — shifts slightly when alt shows to hint at hand movement */}
+          <motion.img
             src={c.src}
             alt={`${c.name}, your reflective companion`}
             className="absolute inset-0 w-full h-full object-cover"
             width={512}
             height={640}
             loading="lazy"
+            animate={{
+              y: showAlt ? (c.id === 'aurora' ? -2 : -1.5) : 0,
+              x: showAlt ? (c.id === 'aurora' ? 1 : -1) : 0,
+            }}
+            transition={{ duration: c.id === 'marcus' ? 0.8 : 0.4, ease: 'easeInOut' }}
           />
-          {/* Alt expression frame, cross-faded on top */}
-          <img
+          {/* Alt expression frame, cross-faded on top with matching shift */}
+          <motion.img
             src={c.altSrc}
             alt=""
             aria-hidden
-            className="absolute inset-0 w-full h-full object-cover ease-in-out"
+            className="absolute inset-0 w-full h-full object-cover"
             style={{
               opacity: showAlt ? 1 : 0,
               transition: c.id === 'marcus' ? 'opacity 0.8s ease-in-out' : 'opacity 0.3s ease-in-out',
@@ -159,6 +166,11 @@ function CompanionCard({
             width={512}
             height={640}
             loading="lazy"
+            animate={{
+              y: showAlt ? (c.id === 'aurora' ? -2 : -1.5) : 0,
+              x: showAlt ? (c.id === 'aurora' ? 1 : -1) : 0,
+            }}
+            transition={{ duration: c.id === 'marcus' ? 0.8 : 0.4, ease: 'easeInOut' }}
           />
         </motion.div>
 
