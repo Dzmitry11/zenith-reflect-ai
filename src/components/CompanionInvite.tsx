@@ -145,7 +145,7 @@ function CompanionCard({
       >
         <motion.div
           animate={{
-            rotate: showAlt && c.id === 'aurora' ? -3 : 0,
+            rotate: showAlt && c.id === 'aurora' ? gesture.rotate - 3 : showAlt ? gesture.rotate * 0.4 : 0,
           }}
           transition={{ duration: 0.6, ease: 'easeInOut' }}
           className="w-28 h-36 sm:w-36 sm:h-44 rounded-2xl overflow-hidden ring-4 ring-background/80 shadow-xl group-hover:ring-primary/40 transition-all duration-500 relative"
@@ -159,8 +159,8 @@ function CompanionCard({
             height={640}
             loading="lazy"
             animate={{
-              y: showAlt ? (c.id === 'aurora' ? -2 : -1.5) : 0,
-              x: showAlt ? (c.id === 'aurora' ? 1 : -1) : 0,
+              y: showAlt ? gesture.y : 0,
+              x: showAlt ? gesture.x * (c.id === 'aurora' ? 1 : -1) : 0,
             }}
             transition={{ duration: c.id === 'marcus' ? 0.8 : 0.4, ease: 'easeInOut' }}
           />
@@ -178,8 +178,8 @@ function CompanionCard({
             height={640}
             loading="lazy"
             animate={{
-              y: showAlt ? (c.id === 'aurora' ? -2 : -1.5) : 0,
-              x: showAlt ? (c.id === 'aurora' ? 1 : -1) : 0,
+              y: showAlt ? gesture.y : 0,
+              x: showAlt ? gesture.x * (c.id === 'aurora' ? 1 : -1) : 0,
             }}
             transition={{ duration: c.id === 'marcus' ? 0.8 : 0.4, ease: 'easeInOut' }}
           />
