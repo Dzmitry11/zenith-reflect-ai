@@ -46,15 +46,26 @@ const COMPANIONS: Array<{
   },
 ];
 
-/** Periodically swaps to an alt expression frame. */
+/** Random gesture offset to avoid identical repetition. */
+function randomGesture(base: number, variance: number) {
+  return base + (Math.random() - 0.5) * 2 * variance;
+}
+
+/** Periodically swaps to an alt expression frame with varied gesture. */
 function useExpressionFrame(interval: number, altDuration: number, startDelay: number) {
   const [showAlt, setShowAlt] = useState(false);
+  const [gesture, setGesture] = useState({ y: 0, x: 0, rotate: 0 });
 
   useEffect(() => {
     let altTimeout: ReturnType<typeof setTimeout>;
     let intervalId: ReturnType<typeof setInterval> | undefined;
     const startTimeout = setTimeout(() => {
       const tick = () => {
+        setGesture({
+          y: randomGesture(-2, 1.2),
+          x: randomGesture(0.8, 0.8),
+          rotate: randomGesture(0, 1.5),
+        });
         setShowAlt(true);
         altTimeout = setTimeout(() => setShowAlt(false), altDuration);
       };
@@ -69,7 +80,7 @@ function useExpressionFrame(interval: number, altDuration: number, startDelay: n
     };
   }, [interval, altDuration, startDelay]);
 
-  return showAlt;
+  return { showAlt, gesture };
 }
 
 
