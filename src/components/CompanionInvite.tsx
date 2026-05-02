@@ -52,22 +52,20 @@ function useExpressionFrame(interval: number, altDuration: number, startDelay: n
 
   useEffect(() => {
     let altTimeout: ReturnType<typeof setTimeout>;
+    let intervalId: ReturnType<typeof setInterval> | undefined;
     const startTimeout = setTimeout(() => {
       const tick = () => {
         setShowAlt(true);
         altTimeout = setTimeout(() => setShowAlt(false), altDuration);
       };
       tick();
-      const id = setInterval(tick, interval);
-      // cleanup for the interval is attached to the outer effect via closure
-      (startTimeout as any)._intervalId = id;
+      intervalId = setInterval(tick, interval);
     }, startDelay);
 
     return () => {
       clearTimeout(startTimeout);
       clearTimeout(altTimeout);
-      const id = (startTimeout as any)._intervalId;
-      if (id) clearInterval(id);
+      if (intervalId) clearInterval(intervalId);
     };
   }, [interval, altDuration, startDelay]);
 
