@@ -117,7 +117,7 @@ function CompanionCard({
           ease: 'easeInOut',
           delay: c.delay,
         }}
-        className={`absolute -inset-3 sm:-inset-4 rounded-full bg-gradient-to-br ${c.glow} blur-2xl -z-10`}
+        className={`absolute -inset-3 sm:-inset-4 rounded-2xl bg-gradient-to-br ${c.glow} blur-2xl -z-10`}
       />
 
       {/* Breathing avatar wrapper, with subtle head tilt when alt frame shows */}
