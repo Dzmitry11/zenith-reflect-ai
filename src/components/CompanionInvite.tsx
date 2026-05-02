@@ -117,7 +117,7 @@ function CompanionCard({
           ease: 'easeInOut',
           delay: c.delay,
         }}
-        className={`absolute -inset-3 sm:-inset-4 rounded-full bg-gradient-to-br ${c.glow} blur-2xl -z-10`}
+        className={`absolute -inset-3 sm:-inset-4 rounded-2xl bg-gradient-to-br ${c.glow} blur-2xl -z-10`}
       />
 
       {/* Breathing avatar wrapper, with subtle head tilt when alt frame shows */}
@@ -135,17 +135,17 @@ function CompanionCard({
         className="relative"
       >
         <motion.div
-          animate={{ rotate: showAlt ? (c.id === 'aurora' ? -3 : 4) : 0 }}
+          animate={{ rotate: showAlt && c.id === 'aurora' ? -3 : 0 }}
           transition={{ duration: 0.6, ease: 'easeInOut' }}
-          className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden ring-4 ring-background/80 shadow-xl group-hover:ring-primary/40 transition-all duration-500 relative"
+          className="w-28 h-36 sm:w-36 sm:h-44 rounded-2xl overflow-hidden ring-4 ring-background/80 shadow-xl group-hover:ring-primary/40 transition-all duration-500 relative"
         >
           {/* Base smile frame */}
           <img
             src={c.src}
             alt={`${c.name}, your reflective companion`}
             className="absolute inset-0 w-full h-full object-cover"
-            width={256}
-            height={256}
+            width={512}
+            height={640}
             loading="lazy"
           />
           {/* Alt expression frame, cross-faded on top */}
@@ -153,10 +153,13 @@ function CompanionCard({
             src={c.altSrc}
             alt=""
             aria-hidden
-            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out"
-            style={{ opacity: showAlt ? 1 : 0 }}
-            width={256}
-            height={256}
+            className="absolute inset-0 w-full h-full object-cover ease-in-out"
+            style={{
+              opacity: showAlt ? 1 : 0,
+              transition: c.id === 'marcus' ? 'opacity 0.8s ease-in-out' : 'opacity 0.3s ease-in-out',
+            }}
+            width={512}
+            height={640}
             loading="lazy"
           />
         </motion.div>
