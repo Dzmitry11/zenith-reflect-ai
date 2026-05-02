@@ -95,7 +95,7 @@ function CompanionCard({
   idx: number;
   onChoose: (id: CompanionId) => void;
 }) {
-  const showAlt = useExpressionFrame(c.interval, c.altDuration, c.startDelay);
+  const { showAlt, gesture } = useExpressionFrame(c.interval, c.altDuration, c.startDelay);
 
   return (
     <motion.button
