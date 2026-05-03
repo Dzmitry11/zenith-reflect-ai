@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Brain, ClipboardList, BarChart3, Shield, ChevronRight, Check } from 'lucide-react';
 import { FadeIn, StaggerContainer, StaggerItem, ScaleIn } from '@/components/animations';
 import { CompanionInvite } from '@/components/CompanionInvite';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import bgLanding from '@/assets/bg-landing.jpg';
 
 export const Route = createFileRoute('/')({
@@ -35,6 +36,7 @@ function LandingPage() {
               <span className="font-display text-lg font-semibold text-foreground">Reflecta</span>
             </div>
             <div className="flex items-center gap-3">
+              <LanguageSwitcher />
               <a href="/login"><Button variant="ghost" size="sm">Sign in</Button></a>
               <a href="/signup"><Button size="sm">Get started</Button></a>
             </div>
