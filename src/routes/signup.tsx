@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 export const Route = createFileRoute('/signup')({
   component: SignupPage,
