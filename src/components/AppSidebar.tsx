@@ -74,6 +74,9 @@ export function AppSidebar() {
             </a>
           );
         })}
+        <div className="px-3 py-2">
+          <LanguageSwitcher />
+        </div>
         <button
           onClick={() => signOut()}
           className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground w-full transition-colors"
