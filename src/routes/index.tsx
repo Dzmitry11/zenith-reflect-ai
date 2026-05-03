@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Brain, ClipboardList, BarChart3, Shield, ChevronRight, Check } from 'lucide-react';
 import { FadeIn, StaggerContainer, StaggerItem, ScaleIn } from '@/components/animations';
 import { CompanionInvite } from '@/components/CompanionInvite';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import bgLanding from '@/assets/bg-landing.jpg';
 
 export const Route = createFileRoute('/')({
