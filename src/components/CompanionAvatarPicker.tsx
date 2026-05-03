@@ -1,8 +1,11 @@
 import { motion } from 'framer-motion';
 import avatarAurora from '@/assets/avatar-aurora.png';
 import avatarMarcus from '@/assets/avatar-marcus.png';
+import avatarElena from '@/assets/avatar-elena.png';
+import avatarThomas from '@/assets/avatar-thomas.png';
+import avatarAmara from '@/assets/avatar-amara.png';
 
-export type CompanionId = 'aurora' | 'marcus';
+export type CompanionId = 'aurora' | 'marcus' | 'elena' | 'thomas' | 'amara';
 
 export const COMPANIONS = {
   aurora: {
@@ -19,14 +22,41 @@ export const COMPANIONS = {
     description: 'Уравновешенный и глубокий тон. Помогает структурировать мысли и находить ясность.',
     avatar: avatarMarcus,
   },
+  elena: {
+    id: 'elena' as const,
+    name: 'Elena',
+    tagline: 'Добрая, мудрая, утешающая',
+    description: 'Как любящая бабушка — утешит, поддержит и никогда не осудит.',
+    avatar: avatarElena,
+  },
+  thomas: {
+    id: 'thomas' as const,
+    name: 'Thomas',
+    tagline: 'Надёжный, спокойный, уверенный',
+    description: 'Спокойствие и уверенность. Помогает найти опору и ясность в сложных ситуациях.',
+    avatar: avatarThomas,
+  },
+  amara: {
+    id: 'amara' as const,
+    name: 'Amara',
+    tagline: 'Оптимистичная, жизнерадостная, вдохновляющая',
+    description: 'Заряжает оптимизмом и верой в лучшее. Помогает увидеть светлую сторону.',
+    avatar: avatarAmara,
+  },
 } as const;
 
 export function getCompanionAvatar(id: string): string {
-  return id === 'marcus' ? avatarMarcus : avatarAurora;
+  switch (id) {
+    case 'marcus': return avatarMarcus;
+    case 'elena': return avatarElena;
+    case 'thomas': return avatarThomas;
+    case 'amara': return avatarAmara;
+    default: return avatarAurora;
+  }
 }
 
 export function getCompanionName(id: string): string {
-  return id === 'marcus' ? 'Marcus' : 'Aurora';
+  return COMPANIONS[id as CompanionId]?.name ?? 'Aurora';
 }
 
 interface CompanionAvatarPickerProps {
@@ -39,7 +69,7 @@ export function CompanionAvatarPicker({ selected, onChange }: CompanionAvatarPic
     <div className="space-y-6">
       <h2 className="text-xl font-display font-semibold text-foreground">Выберите собеседника</h2>
       <p className="text-sm text-muted-foreground">Ваш спутник в процессе саморефлексии.</p>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {Object.values(COMPANIONS).map((c) => (
           <motion.button
             key={c.id}
