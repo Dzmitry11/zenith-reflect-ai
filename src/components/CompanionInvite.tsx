@@ -5,8 +5,14 @@ import auroraSmile from '@/assets/avatar-aurora-smile.png';
 import auroraWink from '@/assets/avatar-aurora-wink.png';
 import marcusSmile from '@/assets/avatar-marcus-smile.png';
 import marcusTilt from '@/assets/avatar-marcus-tilt.png';
+import elenaSmile from '@/assets/avatar-elena-smile.png';
+import elenaWink from '@/assets/avatar-elena-wink.png';
+import thomasSmile from '@/assets/avatar-thomas-smile.png';
+import thomasTilt from '@/assets/avatar-thomas-tilt.png';
+import amaraSmile from '@/assets/avatar-amara-smile.png';
+import amaraWink from '@/assets/avatar-amara-wink.png';
 
-type CompanionId = 'aurora' | 'marcus';
+type CompanionId = 'aurora' | 'marcus' | 'elena' | 'thomas' | 'amara';
 
 const COMPANIONS: Array<{
   id: CompanionId;
@@ -14,9 +20,9 @@ const COMPANIONS: Array<{
   tagline: string;
   src: string;
   altSrc: string;
-  altDuration: number; // how long the alt frame stays visible (ms)
-  interval: number;    // time between expressions (ms)
-  startDelay: number;  // initial offset so they don't sync
+  altDuration: number;
+  interval: number;
+  startDelay: number;
   glow: string;
   delay: number;
 }> = [
@@ -26,7 +32,7 @@ const COMPANIONS: Array<{
     tagline: 'Warm, gentle, here to listen',
     src: auroraSmile,
     altSrc: auroraWink,
-    altDuration: 320,    // quick wink
+    altDuration: 320,
     interval: 5200,
     startDelay: 1800,
     glow: 'from-amber-200/40 via-rose-200/30 to-purple-200/40',
@@ -38,11 +44,47 @@ const COMPANIONS: Array<{
     tagline: 'Calm, grounded, steady presence',
     src: marcusSmile,
     altSrc: marcusTilt,
-    altDuration: 1400,   // longer thoughtful tilt
+    altDuration: 1400,
     interval: 6400,
     startDelay: 4200,
     glow: 'from-emerald-200/40 via-teal-200/30 to-sky-200/40',
     delay: 0.4,
+  },
+  {
+    id: 'elena',
+    name: 'Elena',
+    tagline: 'Kind, wise, always comforting',
+    src: elenaSmile,
+    altSrc: elenaWink,
+    altDuration: 400,
+    interval: 5800,
+    startDelay: 2600,
+    glow: 'from-orange-200/40 via-amber-200/30 to-yellow-200/40',
+    delay: 0.2,
+  },
+  {
+    id: 'thomas',
+    name: 'Thomas',
+    tagline: 'Reliable, calm, reassuring',
+    src: thomasSmile,
+    altSrc: thomasTilt,
+    altDuration: 1200,
+    interval: 7000,
+    startDelay: 3400,
+    glow: 'from-blue-200/40 via-slate-200/30 to-indigo-200/40',
+    delay: 0.6,
+  },
+  {
+    id: 'amara',
+    name: 'Amara',
+    tagline: 'Optimistic, joyful, inspiring',
+    src: amaraSmile,
+    altSrc: amaraWink,
+    altDuration: 350,
+    interval: 5500,
+    startDelay: 3000,
+    glow: 'from-yellow-200/40 via-orange-200/30 to-red-200/40',
+    delay: 0.8,
   },
 ];
 
@@ -96,6 +138,9 @@ function CompanionCard({
   onChoose: (id: CompanionId) => void;
 }) {
   const { showAlt, gesture } = useExpressionFrame(c.interval, c.altDuration, c.startDelay);
+  const isWinkType = c.id === 'aurora' || c.id === 'elena' || c.id === 'amara';
+  const transitionDuration = isWinkType ? 0.4 : 0.8;
+  const opacityTransition = isWinkType ? 'opacity 0.3s ease-in-out' : 'opacity 0.8s ease-in-out';
 
   return (
     <motion.button
@@ -129,7 +174,7 @@ function CompanionCard({
         className={`absolute -inset-3 sm:-inset-4 rounded-2xl bg-gradient-to-br ${c.glow} blur-2xl -z-10`}
       />
 
-      {/* Breathing avatar wrapper, with subtle head tilt when alt frame shows */}
+      {/* Breathing avatar wrapper */}
       <motion.div
         animate={{
           y: [0, -4, 0],
@@ -145,12 +190,11 @@ function CompanionCard({
       >
         <motion.div
           animate={{
-            rotate: showAlt && c.id === 'aurora' ? gesture.rotate - 3 : showAlt ? gesture.rotate * 0.4 : 0,
+            rotate: showAlt && isWinkType ? gesture.rotate - 3 : showAlt ? gesture.rotate * 0.4 : 0,
           }}
           transition={{ duration: 0.6, ease: 'easeInOut' }}
-          className="w-28 h-36 sm:w-36 sm:h-44 rounded-2xl overflow-hidden ring-4 ring-background/80 shadow-xl group-hover:ring-primary/40 transition-all duration-500 relative"
+          className="w-20 h-26 sm:w-28 sm:h-36 rounded-2xl overflow-hidden ring-4 ring-background/80 shadow-xl group-hover:ring-primary/40 transition-all duration-500 relative"
         >
-          {/* Base smile frame — shifts slightly when alt shows to hint at hand movement */}
           <motion.img
             src={c.src}
             alt={`${c.name}, your reflective companion`}
@@ -160,11 +204,10 @@ function CompanionCard({
             loading="lazy"
             animate={{
               y: showAlt ? gesture.y : 0,
-              x: showAlt ? gesture.x * (c.id === 'aurora' ? 1 : -1) : 0,
+              x: showAlt ? gesture.x * (isWinkType ? 1 : -1) : 0,
             }}
-            transition={{ duration: c.id === 'marcus' ? 0.8 : 0.4, ease: 'easeInOut' }}
+            transition={{ duration: transitionDuration, ease: 'easeInOut' }}
           />
-          {/* Alt expression frame, cross-faded on top with matching shift */}
           <motion.img
             src={c.altSrc}
             alt=""
@@ -172,20 +215,19 @@ function CompanionCard({
             className="absolute inset-0 w-full h-full object-cover"
             style={{
               opacity: showAlt ? 1 : 0,
-              transition: c.id === 'marcus' ? 'opacity 0.8s ease-in-out' : 'opacity 0.3s ease-in-out',
+              transition: opacityTransition,
             }}
             width={512}
             height={640}
             loading="lazy"
             animate={{
               y: showAlt ? gesture.y : 0,
-              x: showAlt ? gesture.x * (c.id === 'aurora' ? 1 : -1) : 0,
+              x: showAlt ? gesture.x * (isWinkType ? 1 : -1) : 0,
             }}
-            transition={{ duration: c.id === 'marcus' ? 0.8 : 0.4, ease: 'easeInOut' }}
+            transition={{ duration: transitionDuration, ease: 'easeInOut' }}
           />
         </motion.div>
 
-        {/* Soft inviting shimmer overlay */}
         <motion.div
           aria-hidden
           animate={{ opacity: [0, 0.25, 0] }}
@@ -200,13 +242,12 @@ function CompanionCard({
       </motion.div>
 
       <div className="text-center">
-        <p className="font-display text-base font-semibold text-foreground">{c.name}</p>
-        <p className="text-xs text-muted-foreground max-w-[10rem] leading-snug mt-0.5">
+        <p className="font-display text-sm sm:text-base font-semibold text-foreground">{c.name}</p>
+        <p className="text-[10px] sm:text-xs text-muted-foreground max-w-[8rem] sm:max-w-[10rem] leading-snug mt-0.5">
           {c.tagline}
         </p>
       </div>
 
-      {/* Subtle "tap me" hint on hover */}
       <motion.span
         initial={{ opacity: 0, y: -4 }}
         animate={{ opacity: 0, y: -4 }}
@@ -242,7 +283,7 @@ export function CompanionInvite() {
         Choose a companion to begin
       </motion.p>
 
-      <div className="flex items-end justify-center gap-6 sm:gap-12">
+      <div className="flex items-end justify-center gap-4 sm:gap-8 flex-wrap">
         {COMPANIONS.map((c, idx) => (
           <CompanionCard key={c.id} c={c} idx={idx} onChoose={choose} />
         ))}
