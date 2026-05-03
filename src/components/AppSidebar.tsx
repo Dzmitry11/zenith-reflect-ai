@@ -1,5 +1,6 @@
 import { useLocation } from '@tanstack/react-router';
 import { Home, MessageCircle, BookOpen, Brain, ClipboardList, BarChart3, Settings, Shield, Heart, LogOut } from 'lucide-react';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import { useAuth } from '@/hooks/use-auth';
 import { useLanguage } from '@/i18n/LanguageContext';
 import type { TranslationKey } from '@/i18n/translations';
