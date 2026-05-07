@@ -1,4 +1,4 @@
-import { Brain, ClipboardList, Settings, Shield, CreditCard, User, X, LogOut } from 'lucide-react';
+import { Brain, ClipboardList, Settings, Shield, CreditCard, User, X, LogOut, Fingerprint } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useLanguage } from '@/i18n/LanguageContext';
 import type { TranslationKey } from '@/i18n/translations';
@@ -6,6 +6,7 @@ import type { TranslationKey } from '@/i18n/translations';
 const menuItems: Array<{ to: string; labelKey: TranslationKey; icon: any }> = [
   { to: '/app/therapy-prep', labelKey: 'therapyPrep', icon: ClipboardList },
   { to: '/app/memory', labelKey: 'memory', icon: Brain },
+  { to: '/app/disc-test', labelKey: 'discTest', icon: Fingerprint },
   { to: '/app/settings', labelKey: 'settings', icon: Settings },
   { to: '/app/account', labelKey: 'account', icon: User },
   { to: '/app/subscription', labelKey: 'subscription', icon: CreditCard },
