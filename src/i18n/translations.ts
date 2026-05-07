@@ -27,6 +27,7 @@ const en = {
   subscription: 'Subscription',
   signOut: 'Sign out',
   more: 'More',
+  discTest: 'DISC Test',
 
   // Home
   latestCheckIn: 'Latest check-in',
@@ -253,6 +254,7 @@ const sv: typeof en = {
   subscription: 'Prenumeration',
   signOut: 'Logga ut',
   more: 'Mer',
+  discTest: 'DISC-test',
   latestCheckIn: 'Senaste incheckning',
   feeling: 'Känsla',
   mood: 'Humör',
@@ -458,6 +460,7 @@ const ru: typeof en = {
   subscription: 'Подписка',
   signOut: 'Выйти',
   more: 'Ещё',
+  discTest: 'Тест DISC',
   latestCheckIn: 'Последняя отметка',
   feeling: 'Чувство',
   mood: 'Настроение',

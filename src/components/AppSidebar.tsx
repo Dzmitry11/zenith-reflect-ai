@@ -1,5 +1,5 @@
 import { useLocation } from '@tanstack/react-router';
-import { Home, MessageCircle, BookOpen, Brain, ClipboardList, BarChart3, Settings, Shield, Heart, LogOut } from 'lucide-react';
+import { Home, MessageCircle, BookOpen, Brain, ClipboardList, BarChart3, Settings, Shield, Heart, LogOut, Fingerprint } from 'lucide-react';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { useAuth } from '@/hooks/use-auth';
 import { useLanguage } from '@/i18n/LanguageContext';
@@ -13,6 +13,7 @@ const navItems: Array<{ to: string; labelKey: TranslationKey; icon: any }> = [
   { to: '/app/therapy-prep', labelKey: 'therapyPrep', icon: ClipboardList },
   { to: '/app/insights', labelKey: 'insights', icon: BarChart3 },
   { to: '/app/memory', labelKey: 'memory', icon: Brain },
+  { to: '/app/disc-test', labelKey: 'discTest', icon: Fingerprint },
 ];
 
 const bottomItems: Array<{ to: string; labelKey: TranslationKey; icon: any }> = [
