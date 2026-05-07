@@ -61,6 +61,48 @@ export type Database = {
           },
         ]
       }
+      disc_results: {
+        Row: {
+          answers: Json
+          c_score: number
+          created_at: string
+          d_score: number
+          i_score: number
+          id: string
+          primary_type: string
+          s_score: number
+          secondary_type: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          c_score?: number
+          created_at?: string
+          d_score?: number
+          i_score?: number
+          id?: string
+          primary_type: string
+          s_score?: number
+          secondary_type?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          c_score?: number
+          created_at?: string
+          d_score?: number
+          i_score?: number
+          id?: string
+          primary_type?: string
+          s_score?: number
+          secondary_type?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       feature_usage_events: {
         Row: {
           created_at: string
