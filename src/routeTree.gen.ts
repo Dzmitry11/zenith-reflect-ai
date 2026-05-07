@@ -26,6 +26,7 @@ import { Route as AppMemoryRouteImport } from './routes/app.memory'
 import { Route as AppJournalRouteImport } from './routes/app.journal'
 import { Route as AppInsightsRouteImport } from './routes/app.insights'
 import { Route as AppHomeRouteImport } from './routes/app.home'
+import { Route as AppDiscTestRouteImport } from './routes/app.disc-test'
 import { Route as AppCheckInRouteImport } from './routes/app.check-in'
 import { Route as AppAccountRouteImport } from './routes/app.account'
 import { Route as AppChatIndexRouteImport } from './routes/app.chat.index'
@@ -116,6 +117,11 @@ const AppHomeRoute = AppHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDiscTestRoute = AppDiscTestRouteImport.update({
+  id: '/disc-test',
+  path: '/disc-test',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCheckInRoute = AppCheckInRouteImport.update({
   id: '/check-in',
   path: '/check-in',
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/app/account': typeof AppAccountRoute
   '/app/check-in': typeof AppCheckInRoute
+  '/app/disc-test': typeof AppDiscTestRoute
   '/app/home': typeof AppHomeRoute
   '/app/insights': typeof AppInsightsRoute
   '/app/journal': typeof AppJournalRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/app/account': typeof AppAccountRoute
   '/app/check-in': typeof AppCheckInRoute
+  '/app/disc-test': typeof AppDiscTestRoute
   '/app/home': typeof AppHomeRoute
   '/app/insights': typeof AppInsightsRoute
   '/app/journal': typeof AppJournalRoute
@@ -195,6 +203,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/app/account': typeof AppAccountRoute
   '/app/check-in': typeof AppCheckInRoute
+  '/app/disc-test': typeof AppDiscTestRoute
   '/app/home': typeof AppHomeRoute
   '/app/insights': typeof AppInsightsRoute
   '/app/journal': typeof AppJournalRoute
@@ -220,6 +229,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/app/account'
     | '/app/check-in'
+    | '/app/disc-test'
     | '/app/home'
     | '/app/insights'
     | '/app/journal'
@@ -243,6 +253,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/app/account'
     | '/app/check-in'
+    | '/app/disc-test'
     | '/app/home'
     | '/app/insights'
     | '/app/journal'
@@ -266,6 +277,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/app/account'
     | '/app/check-in'
+    | '/app/disc-test'
     | '/app/home'
     | '/app/insights'
     | '/app/journal'
@@ -411,6 +423,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHomeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/disc-test': {
+      id: '/app/disc-test'
+      path: '/disc-test'
+      fullPath: '/app/disc-test'
+      preLoaderRoute: typeof AppDiscTestRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/check-in': {
       id: '/app/check-in'
       path: '/check-in'
@@ -445,6 +464,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppAccountRoute: typeof AppAccountRoute
   AppCheckInRoute: typeof AppCheckInRoute
+  AppDiscTestRoute: typeof AppDiscTestRoute
   AppHomeRoute: typeof AppHomeRoute
   AppInsightsRoute: typeof AppInsightsRoute
   AppJournalRoute: typeof AppJournalRoute
@@ -461,6 +481,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAccountRoute: AppAccountRoute,
   AppCheckInRoute: AppCheckInRoute,
+  AppDiscTestRoute: AppDiscTestRoute,
   AppHomeRoute: AppHomeRoute,
   AppInsightsRoute: AppInsightsRoute,
   AppJournalRoute: AppJournalRoute,
