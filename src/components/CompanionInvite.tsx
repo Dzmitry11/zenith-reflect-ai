@@ -280,7 +280,10 @@ function CompanionCard({
               y: showAlt ? gesture.y : 0,
               x: showAlt ? gesture.x * (isWinkType ? 1 : -1) : 0,
             }}
-            transition={{ duration: transitionDuration, ease: 'easeInOut' }}
+            transition={{
+              duration: transitionDuration,
+              ease: isNewTrio ? [0.4, 0, 0.2, 1] : 'easeInOut',
+            }}
           />
         </motion.div>
 
