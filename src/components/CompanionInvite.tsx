@@ -176,11 +176,18 @@ function CompanionCard({
   idx: number;
   onChoose: (id: CompanionId) => void;
 }) {
+  const isMobile = useIsMobile();
+  const prefersReducedMotion = useReducedMotion();
+  // On mobile, throttle the gesture loop ~1.6x to halve commits per second
+  // without changing the perceived rhythm. Disable entirely under reduced motion.
+  const animationsEnabled = !prefersReducedMotion;
+  const mobileFactor = isMobile ? 1.6 : 1;
   const { showAlt, gesture } = useExpressionFrame(
-    c.interval,
+    c.interval * mobileFactor,
     c.altDuration,
     c.startDelay,
     GESTURE_PROFILES[c.id],
+    animationsEnabled,
   );
   const isWinkType = c.id === 'aurora' || c.id === 'elena' || c.id === 'amara';
   // Smoother, slightly longer eases for the new trio.
@@ -193,6 +200,8 @@ function CompanionCard({
     : isWinkType
       ? 'opacity 0.3s ease-in-out'
       : 'opacity 0.8s ease-in-out';
+  // Hint to the compositor — keep these layers off the main paint pass.
+  const gpuStyle = { willChange: 'transform', transform: 'translateZ(0)' } as const;
 
   return (
     <motion.button
