@@ -93,34 +93,70 @@ function randomGesture(base: number, variance: number) {
   return base + (Math.random() - 0.5) * 2 * variance;
 }
 
+type GestureProfile = {
+  yRange: [number, number];
+  xRange: [number, number];
+  rotateRange: [number, number];
+  scaleRange: [number, number];
+};
+
+const GESTURE_PROFILES: Record<CompanionId, GestureProfile> = {
+  aurora:  { yRange: [-2, 1.2], xRange: [0.8, 0.8], rotateRange: [0, 1.5], scaleRange: [1, 0.012] },
+  marcus:  { yRange: [-1.4, 1], xRange: [-0.6, 0.6], rotateRange: [0, 1.2], scaleRange: [1, 0.01] },
+  // Slightly wider, softer envelopes — feel more alive but still gentle.
+  elena:   { yRange: [-2.4, 1.6], xRange: [0.4, 1.4], rotateRange: [-0.4, 2.2], scaleRange: [1.004, 0.014] },
+  thomas:  { yRange: [-1.8, 1.2], xRange: [-1.2, 1.2], rotateRange: [-0.6, 1.8], scaleRange: [1, 0.012] },
+  amara:   { yRange: [-2.6, 1.8], xRange: [0.6, 1.6], rotateRange: [-0.6, 2.4], scaleRange: [1.005, 0.016] },
+};
+
+function pickGesture(p: GestureProfile) {
+  return {
+    y: randomGesture(p.yRange[0], p.yRange[1]),
+    x: randomGesture(p.xRange[0], p.xRange[1]),
+    rotate: randomGesture(p.rotateRange[0], p.rotateRange[1]),
+    scale: randomGesture(p.scaleRange[0], p.scaleRange[1]),
+  };
+}
+
 /** Periodically swaps to an alt expression frame with varied gesture. */
-function useExpressionFrame(interval: number, altDuration: number, startDelay: number) {
+function useExpressionFrame(
+  interval: number,
+  altDuration: number,
+  startDelay: number,
+  profile: GestureProfile,
+) {
   const [showAlt, setShowAlt] = useState(false);
-  const [gesture, setGesture] = useState({ y: 0, x: 0, rotate: 0 });
+  const [gesture, setGesture] = useState({ y: 0, x: 0, rotate: 0, scale: 1 });
 
   useEffect(() => {
     let altTimeout: ReturnType<typeof setTimeout>;
-    let intervalId: ReturnType<typeof setInterval> | undefined;
-    const startTimeout = setTimeout(() => {
-      const tick = () => {
-        setGesture({
-          y: randomGesture(-2, 1.2),
-          x: randomGesture(0.8, 0.8),
-          rotate: randomGesture(0, 1.5),
-        });
+    let nextTimeout: ReturnType<typeof setTimeout>;
+    let cancelled = false;
+
+    const schedule = (delay: number) => {
+      nextTimeout = setTimeout(() => {
+        if (cancelled) return;
+        setGesture(pickGesture(profile));
         setShowAlt(true);
-        altTimeout = setTimeout(() => setShowAlt(false), altDuration);
-      };
-      tick();
-      intervalId = setInterval(tick, interval);
-    }, startDelay);
+        // Vary the hold duration ±20% so repeats don't feel identical.
+        const hold = altDuration * (0.85 + Math.random() * 0.3);
+        altTimeout = setTimeout(() => {
+          if (cancelled) return;
+          setShowAlt(false);
+          // Vary the gap between gestures ±25%.
+          schedule(interval * (0.75 + Math.random() * 0.5));
+        }, hold);
+      }, delay);
+    };
+
+    schedule(startDelay);
 
     return () => {
-      clearTimeout(startTimeout);
+      cancelled = true;
+      clearTimeout(nextTimeout);
       clearTimeout(altTimeout);
-      if (intervalId) clearInterval(intervalId);
     };
-  }, [interval, altDuration, startDelay]);
+  }, [interval, altDuration, startDelay, profile]);
 
   return { showAlt, gesture };
 }
