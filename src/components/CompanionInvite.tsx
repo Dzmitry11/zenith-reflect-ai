@@ -173,10 +173,23 @@ function CompanionCard({
   idx: number;
   onChoose: (id: CompanionId) => void;
 }) {
-  const { showAlt, gesture } = useExpressionFrame(c.interval, c.altDuration, c.startDelay);
+  const { showAlt, gesture } = useExpressionFrame(
+    c.interval,
+    c.altDuration,
+    c.startDelay,
+    GESTURE_PROFILES[c.id],
+  );
   const isWinkType = c.id === 'aurora' || c.id === 'elena' || c.id === 'amara';
-  const transitionDuration = isWinkType ? 0.4 : 0.8;
-  const opacityTransition = isWinkType ? 'opacity 0.3s ease-in-out' : 'opacity 0.8s ease-in-out';
+  // Smoother, slightly longer eases for the new trio.
+  const isNewTrio = c.id === 'elena' || c.id === 'thomas' || c.id === 'amara';
+  const transitionDuration = isNewTrio ? (isWinkType ? 0.6 : 1.0) : isWinkType ? 0.4 : 0.8;
+  const opacityTransition = isNewTrio
+    ? isWinkType
+      ? 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
+      : 'opacity 1s cubic-bezier(0.4, 0, 0.2, 1)'
+    : isWinkType
+      ? 'opacity 0.3s ease-in-out'
+      : 'opacity 0.8s ease-in-out';
 
   return (
     <motion.button
