@@ -159,7 +159,7 @@ function useExpressionFrame(
       clearTimeout(nextTimeout);
       clearTimeout(altTimeout);
     };
-  }, [interval, altDuration, startDelay, profile]);
+  }, [interval, altDuration, startDelay, profile, enabled]);
 
   return { showAlt, gesture };
 }
