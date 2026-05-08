@@ -240,8 +240,12 @@ function CompanionCard({
         <motion.div
           animate={{
             rotate: showAlt && isWinkType ? gesture.rotate - 3 : showAlt ? gesture.rotate * 0.4 : 0,
+            scale: showAlt ? gesture.scale : 1,
           }}
-          transition={{ duration: 0.6, ease: 'easeInOut' }}
+          transition={{
+            duration: isNewTrio ? 0.9 : 0.6,
+            ease: isNewTrio ? [0.4, 0, 0.2, 1] : 'easeInOut',
+          }}
           className="w-20 h-26 sm:w-28 sm:h-36 rounded-2xl overflow-hidden ring-4 ring-background/80 shadow-xl group-hover:ring-primary/40 transition-all duration-500 relative"
         >
           <motion.img
@@ -255,7 +259,10 @@ function CompanionCard({
               y: showAlt ? gesture.y : 0,
               x: showAlt ? gesture.x * (isWinkType ? 1 : -1) : 0,
             }}
-            transition={{ duration: transitionDuration, ease: 'easeInOut' }}
+            transition={{
+              duration: transitionDuration,
+              ease: isNewTrio ? [0.4, 0, 0.2, 1] : 'easeInOut',
+            }}
           />
           <motion.img
             src={c.altSrc}
