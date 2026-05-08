@@ -125,11 +125,13 @@ function useExpressionFrame(
   altDuration: number,
   startDelay: number,
   profile: GestureProfile,
+  enabled: boolean = true,
 ) {
   const [showAlt, setShowAlt] = useState(false);
   const [gesture, setGesture] = useState({ y: 0, x: 0, rotate: 0, scale: 1 });
 
   useEffect(() => {
+    if (!enabled) return;
     let altTimeout: ReturnType<typeof setTimeout>;
     let nextTimeout: ReturnType<typeof setTimeout>;
     let cancelled = false;
