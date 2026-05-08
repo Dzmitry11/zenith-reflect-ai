@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useNavigate } from '@tanstack/react-router';
 import auroraSmile from '@/assets/avatar-aurora-smile.png';
 import auroraWink from '@/assets/avatar-aurora-wink.png';
