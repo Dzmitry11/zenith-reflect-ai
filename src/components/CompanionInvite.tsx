@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useNavigate } from '@tanstack/react-router';
 import auroraSmile from '@/assets/avatar-aurora-smile.png';
 import auroraWink from '@/assets/avatar-aurora-wink.png';
@@ -124,11 +125,13 @@ function useExpressionFrame(
   altDuration: number,
   startDelay: number,
   profile: GestureProfile,
+  enabled: boolean = true,
 ) {
   const [showAlt, setShowAlt] = useState(false);
   const [gesture, setGesture] = useState({ y: 0, x: 0, rotate: 0, scale: 1 });
 
   useEffect(() => {
+    if (!enabled) return;
     let altTimeout: ReturnType<typeof setTimeout>;
     let nextTimeout: ReturnType<typeof setTimeout>;
     let cancelled = false;
@@ -156,7 +159,7 @@ function useExpressionFrame(
       clearTimeout(nextTimeout);
       clearTimeout(altTimeout);
     };
-  }, [interval, altDuration, startDelay, profile]);
+  }, [interval, altDuration, startDelay, profile, enabled]);
 
   return { showAlt, gesture };
 }
@@ -173,11 +176,18 @@ function CompanionCard({
   idx: number;
   onChoose: (id: CompanionId) => void;
 }) {
+  const isMobile = useIsMobile();
+  const prefersReducedMotion = useReducedMotion();
+  // On mobile, throttle the gesture loop ~1.6x to halve commits per second
+  // without changing the perceived rhythm. Disable entirely under reduced motion.
+  const animationsEnabled = !prefersReducedMotion;
+  const mobileFactor = isMobile ? 1.6 : 1;
   const { showAlt, gesture } = useExpressionFrame(
-    c.interval,
+    c.interval * mobileFactor,
     c.altDuration,
     c.startDelay,
     GESTURE_PROFILES[c.id],
+    animationsEnabled,
   );
   const isWinkType = c.id === 'aurora' || c.id === 'elena' || c.id === 'amara';
   // Smoother, slightly longer eases for the new trio.
@@ -190,6 +200,8 @@ function CompanionCard({
     : isWinkType
       ? 'opacity 0.3s ease-in-out'
       : 'opacity 0.8s ease-in-out';
+  // Hint to the compositor — keep these layers off the main paint pass.
+  const gpuStyle = { willChange: 'transform', transform: 'translateZ(0)' } as const;
 
   return (
     <motion.button
@@ -207,34 +219,40 @@ function CompanionCard({
       className="group relative flex flex-col items-center gap-3 focus:outline-none"
       aria-label={`Choose ${c.name} as your companion`}
     >
-      {/* Pulsing glow halo */}
+      {/* Pulsing glow halo — static (no scale loop) on mobile to avoid blur repaints */}
       <motion.div
         aria-hidden
-        animate={{
-          scale: [1, 1.12, 1],
-          opacity: [0.55, 0.85, 0.55],
-        }}
+        animate={
+          animationsEnabled && !isMobile
+            ? { scale: [1, 1.12, 1], opacity: [0.55, 0.85, 0.55] }
+            : { scale: 1, opacity: 0.65 }
+        }
         transition={{
           duration: 3.6,
-          repeat: Infinity,
+          repeat: animationsEnabled && !isMobile ? Infinity : 0,
           ease: 'easeInOut',
           delay: c.delay,
         }}
-        className={`absolute -inset-3 sm:-inset-4 rounded-2xl bg-gradient-to-br ${c.glow} blur-2xl -z-10`}
+        style={gpuStyle}
+        className={`absolute -inset-3 sm:-inset-4 rounded-2xl bg-gradient-to-br ${c.glow} ${
+          isMobile ? 'blur-lg' : 'blur-2xl'
+        } -z-10`}
       />
 
       {/* Breathing avatar wrapper */}
       <motion.div
-        animate={{
-          y: [0, -4, 0],
-          scale: [1, 1.015, 1],
-        }}
+        animate={
+          animationsEnabled
+            ? { y: [0, -4, 0], scale: [1, 1.015, 1] }
+            : { y: 0, scale: 1 }
+        }
         transition={{
-          duration: 4.2,
-          repeat: Infinity,
+          duration: isMobile ? 6 : 4.2,
+          repeat: animationsEnabled ? Infinity : 0,
           ease: 'easeInOut',
           delay: c.delay,
         }}
+        style={gpuStyle}
         className="relative"
       >
         <motion.div
@@ -246,6 +264,7 @@ function CompanionCard({
             duration: isNewTrio ? 0.9 : 0.6,
             ease: isNewTrio ? [0.4, 0, 0.2, 1] : 'easeInOut',
           }}
+          style={gpuStyle}
           className="w-20 h-26 sm:w-28 sm:h-36 rounded-2xl overflow-hidden ring-4 ring-background/80 shadow-xl group-hover:ring-primary/40 transition-all duration-500 relative"
         >
           <motion.img
@@ -255,6 +274,8 @@ function CompanionCard({
             width={512}
             height={640}
             loading="lazy"
+            decoding="async"
+            draggable={false}
             animate={{
               y: showAlt ? gesture.y : 0,
               x: showAlt ? gesture.x * (isWinkType ? 1 : -1) : 0,
@@ -263,6 +284,7 @@ function CompanionCard({
               duration: transitionDuration,
               ease: isNewTrio ? [0.4, 0, 0.2, 1] : 'easeInOut',
             }}
+            style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
           />
           <motion.img
             src={c.altSrc}
@@ -272,10 +294,14 @@ function CompanionCard({
             style={{
               opacity: showAlt ? 1 : 0,
               transition: opacityTransition,
+              willChange: 'opacity, transform',
+              backfaceVisibility: 'hidden',
             }}
             width={512}
             height={640}
             loading="lazy"
+            decoding="async"
+            draggable={false}
             animate={{
               y: showAlt ? gesture.y : 0,
               x: showAlt ? gesture.x * (isWinkType ? 1 : -1) : 0,
@@ -287,17 +313,21 @@ function CompanionCard({
           />
         </motion.div>
 
-        <motion.div
-          aria-hidden
-          animate={{ opacity: [0, 0.25, 0] }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: c.delay + 1.5,
-          }}
-          className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white to-transparent pointer-events-none"
-        />
+        {/* Decorative sheen — skip on mobile (large gradient overlay = wasted GPU). */}
+        {!isMobile && animationsEnabled && (
+          <motion.div
+            aria-hidden
+            animate={{ opacity: [0, 0.25, 0] }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: 'easeInOut',
+              delay: c.delay + 1.5,
+            }}
+            style={gpuStyle}
+            className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white to-transparent pointer-events-none"
+          />
+        )}
       </motion.div>
 
       <div className="text-center">
